@@ -49,13 +49,11 @@ python -m http.server 8000
 # then open http://localhost:8000
 ```
 
-## Go live
+## Deployment
 
-Any static host — Vercel, Netlify, GitHub Pages. Opening `index.html` over
-`file://` will not work, and neither will plain HTTP: browsers only expose USB
-to HTTPS or `localhost`.
-
-`vercel.json` ships the headers the flasher depends on:
+Static site on Vercel over HTTPS — browsers only expose USB to HTTPS or
+`localhost`, so `file://` and plain HTTP will never work. The CORS and
+content-type headers the flasher needs ship in `vercel.json`:
 
 | Path | Header | Why |
 | --- | --- | --- |
@@ -65,45 +63,8 @@ to HTTPS or `localhost`.
 | `/manifests/*` | `Content-Type: application/json` | parsed as a manifest, not a download |
 
 ```sh
-vercel --prod      # or: push to a repo and import it in the dashboard
+vercel --prod
 ```
-
-### Deploy your own
-
-Fork it, import the fork in Vercel (no build settings), done. On other hosts,
-copy the CORS and content-type headers from `vercel.json` over.
-
-<details>
-<summary>Maintainer checklist</summary>
-
-- **Social card origin.** `og:url`, `og:image`, `twitter:image` and the
-  canonical link carry a placeholder origin — swap them for the production URL
-  (marked comment in `index.html`'s `<head>`).
-- **Comments (optional).** Enable Discussions, install the giscus app, then
-  paste `category` / `categoryId` from giscus.app plus the repo's node id
-  (`repoId`) into `GISCUS` in `index.html`.
-
-</details>
-
-## Add a board
-
-1. Put the merged `.bin` in `firmware/`. Full images sit at offset `0x0000`;
-   app-only builds go at `0x10000` and set erase off in their manifest.
-2. Copy an entry in `boards.js` and change `name`, `group`, `chip`, `file` and
-   `manifest`.
-3. Add its SHA-256:
-   `Get-FileHash -Algorithm SHA256 firmware\your-board.bin`
-4. Optional: point `diagram` and `guide` at a schematic and a wiring guide.
-
-Then **bump the `boards.js?v=` number in `index.html`** so returning visitors
-get the new list. The dropdowns, the board library, the hero panel and the
-generated flash command all rebuild themselves from `boards.js` — there is no
-other file to touch.
-
-Diagrams are **per chip, not per display**: swapping a panel is a firmware
-define, not a wiring change, so every ESP32-S3 board shares one diagram.
-Wiring *guides* stay per board, because pin notes and the touch-vs-buttons
-difference do vary.
 
 ## Checks
 
