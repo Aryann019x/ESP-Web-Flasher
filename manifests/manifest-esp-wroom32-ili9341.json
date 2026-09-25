@@ -1,0 +1,1 @@
+{"builds": [{"chipFamily": "ESP32", "parts": [{"offset": 0, "path": "../firmware/Bruce-esp-wroom32-ili9341.bin"}]}], "name": "Bruce ESP-WROOM-32 + ILI9341 2.4 TFT (buttons)", "new_install_prompt_erase": true, "version": "2026-09-14"}

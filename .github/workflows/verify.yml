@@ -1,0 +1,26 @@
+name: verify
+
+# Guards the things that are easy to break by hand and hard to notice:
+# a rebuilt .bin whose SHA-256 in boards.js was never updated, a board pointing
+# at a diagram or guide that was renamed, a manifest drifting away from its
+# board entry, an unused asset left behind, or a relative og:image.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  integrity:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Verify boards, hashes, manifests and assets
+        run: node tools/verify.mjs

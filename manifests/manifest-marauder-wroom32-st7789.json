@@ -1,0 +1,1 @@
+{"builds": [{"chipFamily": "ESP32", "parts": [{"offset": 0, "path": "../firmware/Marauder-esp-wroom32-st7789.bin"}]}], "name": "Marauder ESP-WROOM-32 + ST7789 2.8\" (touch)", "new_install_prompt_erase": true, "version": "2026-09-25"}

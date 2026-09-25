@@ -1,0 +1,9 @@
+Thumbs.db
+.DS_Store
+Desktop.ini
+*.log
+*.bat
+
+# deploy tooling
+node_modules/
+.vercel/

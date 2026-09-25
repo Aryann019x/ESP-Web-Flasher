@@ -1,0 +1,7 @@
+# Bundled firmware, media and fonts are binary: never diff them, never let git
+# rewrite their bytes when normalising line endings.
+*.bin    binary
+*.png    binary
+*.jpg    binary
+*.woff2  binary
+*.ico    binary

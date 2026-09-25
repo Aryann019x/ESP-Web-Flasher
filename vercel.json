@@ -1,0 +1,1 @@
+{"cleanUrls": true, "headers": [{"source": "/firmware/(.*)", "headers": [{"key": "Access-Control-Allow-Origin", "value": "*"}, {"key": "Content-Type", "value": "application/octet-stream"}]}, {"source": "/manifests/(.*)", "headers": [{"key": "Access-Control-Allow-Origin", "value": "*"}, {"key": "Content-Type", "value": "application/json"}]}]}

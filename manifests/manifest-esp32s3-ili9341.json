@@ -1,0 +1,1 @@
+{"builds": [{"chipFamily": "ESP32-S3", "parts": [{"offset": 0, "path": "../firmware/Bruce-esp32s3-ili9341.bin"}]}], "name": "Bruce ESP32-S3 + ILI9341 2.8 TFT (touch)", "new_install_prompt_erase": true, "version": "2026-09-14"}

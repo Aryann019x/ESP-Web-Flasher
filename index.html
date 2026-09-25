@@ -1,0 +1,1928 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Flash ESP32 / ESP32-S3 firmware from your browser. Select your board, verify wiring, flash, then confirm the boot logs. No software to install.">
+<!-- Social cards. These must be absolute URLs — crawlers ignore relative paths.
+     ONE origin to keep in sync: it appears in og:url, og:image, og:image:secure_url,
+     twitter:image and <link rel="canonical">. Update all of them together if the
+     deploy lands on a different name, or when you move to a custom domain. -->
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="ESP Firmware Flasher">
+<meta property="og:url" content="https://esp-web-flasher.vercel.app/">
+<meta property="og:title" content="ESP Firmware Flasher">
+<meta property="og:description" content="Flash ESP32 + ESP32-S3 from your browser. No installer, no uploads, just USB.">
+<meta property="og:image" content="https://esp-web-flasher.vercel.app/images/og.png">
+<meta property="og:image:secure_url" content="https://esp-web-flasher.vercel.app/images/og.png">
+<meta property="og:image:type" content="image/png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="ESP Firmware Flasher — flash ESP32 and ESP32-S3 firmware from your browser">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="ESP Firmware Flasher">
+<meta name="twitter:description" content="Flash ESP32 + ESP32-S3 from your browser. No installer, no uploads, just USB.">
+<meta name="twitter:image" content="https://esp-web-flasher.vercel.app/images/og.png">
+<meta name="twitter:image:alt" content="ESP Firmware Flasher">
+<link rel="canonical" href="https://esp-web-flasher.vercel.app/">
+<meta name="theme-color" content="#191919">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23f5f5f5'/%3E%3Cpath d='M17 5L7 18h7l-1 9 10-13h-7l1-9z' fill='%23000'/%3E%3C/svg%3E">
+<title>ESP Firmware Flasher</title>
+<script type="module" src="https://unpkg.com/esp-web-tools@10/dist/web/install-button.js?module"></script>
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<script src="boards.js?v=9"></script>
+<style>
+@font-face{font-family:'Departure Mono';font-style:normal;font-weight:400;font-display:swap;src:url(fonts/departure-mono-400.woff2) format('woff2')}
+@font-face{font-family:'JetBrains Mono';font-style:normal;font-weight:400;font-display:swap;src:url(fonts/jetbrains-mono-400-latin-ext.woff2) format('woff2');unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF}
+@font-face{font-family:'JetBrains Mono';font-style:normal;font-weight:400;font-display:swap;src:url(fonts/jetbrains-mono-400-latin.woff2) format('woff2');unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+esp-web-install-button{--esp-tools-button-color:#f5f5f5;--esp-tools-button-text-color:#000;--esp-tools-button-border-radius:10px}
+:root{--bg:#171717;--panel:#202020;--panel2:#1e1e1e;--line:#2c2c2c;--line2:#383838;--txt:#F3F3F3;--mut:#969696;--faint:#7f7f7f;--soft:#161616;--btnbg:linear-gradient(180deg,#f4f4f4,#d9d9d9);--btnink:#161616;--codebg:#262626;--codetxt:#e2e2e2;--headerbg:rgba(23,23,23,.8);--modalbg:rgba(10,10,10,.88);--glowtop:#1e1e1e;--gridline:rgba(200,200,200,.06);--r:20px;--r-in:12px;--r-ctl:10px;--r-sm:8px;--h-ctl:38px;--acc:0,229,255;--bloom:rgba(150,160,175,.05);--cardbg:linear-gradient(175deg,color-mix(in srgb,var(--panel) 78%,transparent),color-mix(in srgb,var(--panel2) 84%,transparent));--cardline:1px solid rgba(255,255,255,.06);--edge:rgba(255,255,255,.1);--edge-h:rgba(255,255,255,.14);--ctl-line:1px solid rgba(255,255,255,.08);--hair:1px solid rgba(255,255,255,.06);--dash:1.5px dashed rgba(255,255,255,.1);--cardsh:0 1px 0 rgba(255,255,255,.05) inset,0 1px 2px rgba(0,0,0,.2),0 20px 50px -24px rgba(0,0,0,.6);--cardsh-h:0 1px 0 rgba(255,255,255,.07) inset,0 1px 2px rgba(0,0,0,.2),0 28px 60px -26px rgba(0,0,0,.65),0 0 40px -12px rgba(var(--acc),.1);--platesh:0 26px 50px -28px rgba(0,0,0,.9),0 4px 14px -8px rgba(0,0,0,.5);--fpx:'Departure Mono',monospace;--fui:'Inter','Manrope','DM Sans',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;--fmono:'JetBrains Mono','IBM Plex Mono',ui-monospace,SFMono-Regular,Menlo,Consolas,'Liberation Mono',monospace;--neon:#00e5ff}
+html[data-theme="light"]{--bg:#E8E7E2;--panel:#F0EFEB;--panel2:#EAE8E2;--line:#d6d2c7;--line2:#c4c0b4;--txt:#252525;--mut:#777777;--faint:#6f7681;--soft:#dbd9d1;--btnbg:linear-gradient(180deg,#33363d,#17181c);--btnink:#f4f4f2;--codebg:#E2E0D9;--codetxt:#2b2e33;--headerbg:rgba(227,225,218,.8);--modalbg:rgba(227,225,218,.92);--glowtop:#d8d5cb;--gridline:rgba(60,65,75,.09);--neon:#0369a1;--acc:3,105,161;--bloom:rgba(3,105,161,.06);--cardline:1px solid rgba(30,40,55,.14);--edge:rgba(30,40,55,.14);--edge-h:rgba(30,40,55,.18);--ctl-line:1px solid rgba(30,40,55,.16);--hair:1px solid rgba(30,40,55,.1);--dash:1.5px dashed rgba(30,40,55,.24);--cardsh:0 1px 0 rgba(255,255,255,.5) inset,0 1px 3px rgba(30,40,55,.07),0 6px 16px -6px rgba(30,40,55,.1);--cardsh-h:0 1px 0 rgba(255,255,255,.6) inset,0 2px 5px rgba(30,40,55,.1),0 10px 24px -8px rgba(30,40,55,.14);--cardbg:linear-gradient(175deg,color-mix(in srgb,var(--panel) 88%,transparent),color-mix(in srgb,var(--panel2) 92%,transparent))}
+html[data-theme="light"] .badge{border-color:rgba(3,105,161,.4);color:var(--neon);background:rgba(3,105,161,.07);box-shadow:none}
+html[data-theme="light"] select:focus{box-shadow:0 0 0 3px rgba(3,105,161,.12)}
+html[data-theme="light"] .term .row button:not(.primary){background:color-mix(in srgb,var(--txt) 5%,transparent);color:var(--txt);border:var(--ctl-line)}
+option[value=""]{color:var(--mut)}
+.partwrap{grid-column:1/-1;min-width:0}
+.plab{display:block;font-family:var(--fpx);font-size:.62rem;letter-spacing:.05em;text-transform:uppercase;color:var(--mut);margin:2px 0 6px}
+#partlist{display:grid;gap:8px}
+#partlist:empty{display:none}
+.prow{display:grid;grid-template-columns:minmax(0,1fr) 132px 34px;gap:8px;align-items:center}
+.prow .hexin{width:100%;min-width:0}
+.pfile{font-family:var(--fui);font-size:.85rem;color:var(--txt);background:color-mix(in srgb,var(--txt) 3%,transparent);border:1px solid var(--line2);border-radius:var(--r-in);padding:8px 12px;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-align:left;cursor:pointer}
+.pfile:hover{border-color:var(--mut)}
+.px{min-height:34px;align-self:stretch;border:1px solid var(--line2);border-radius:var(--r-ctl);background:transparent;color:var(--mut);font-size:1rem;line-height:1;cursor:pointer}
+.px:hover{color:#e0685a;border-color:#e0685a}
+.padd{width:100%;border:1px dashed var(--line2);border-radius:var(--r-in);background:transparent;color:var(--mut);font-family:var(--fpx);font-size:.62rem;letter-spacing:.04em;padding:9px;cursor:pointer}
+.padd:hover{color:var(--txt);border-color:var(--mut)}
+.prow input.bad{box-shadow:0 0 0 2px rgba(224,108,90,.45)}
+@media(max-width:560px){.prow{grid-template-columns:minmax(0,1fr) 110px 32px}}
+html[data-theme="light"] h2.sec::before{box-shadow:none}
+html[data-theme="light"] body>header{box-shadow:0 8px 24px rgba(30,40,60,.08);border-bottom-color:rgba(3,105,161,.1)}
+html[data-theme="light"] .warn{background:rgba(3,105,161,.04);box-shadow:none;border:1px solid rgba(3,105,161,.15);border-left:2px solid rgba(3,105,161,.5)}
+/* DARK THEME - restraint pass. The light theme above already reads as a finished instrument:
+   neutral hairlines, accent reserved for small marks, no halos. These dark-only overrides strip
+   the neon lining from the default dark theme - accent-tinted fields, glowing edges, haloed
+   dots, pulsing shadows. Nothing in the light theme block above is affected. */
+html:not([data-theme="light"]){--cardsh-h:0 1px 0 rgba(255,255,255,.06) inset,0 1px 2px rgba(0,0,0,.2),0 26px 56px -26px rgba(0,0,0,.62)}
+/* The photographic backdrop is the light theme's flat paper no longer: every hairline and
+   every translucent fill now sits on a high-frequency texture. At 78% the panel fill let the
+   filaments pattern straight through the cards, so card interiors were noisy and the 1px
+   edge - the only thing separating card from backdrop - was too faint to read as an edge at
+   all. Panels go near-opaque (they sit *on* the texture, not in it) and the hairlines come up
+   to the strength they'd need over a flat surface. Light theme is untouched. */
+html:not([data-theme="light"]){--cardbg:linear-gradient(175deg,color-mix(in srgb,var(--panel) 94%,transparent),color-mix(in srgb,var(--panel2) 97%,transparent));--cardline:1px solid rgba(255,255,255,.1);--hair:1px solid rgba(255,255,255,.09);--ctl-line:1px solid rgba(255,255,255,.12);--dash:1.5px dashed rgba(255,255,255,.16)}
+/* backdrop blur over a texture costs a compositing layer and smears what it samples across
+   the rounded corner. At 94% fill it is invisible anyway, so it goes. */
+html:not([data-theme="light"]) .band,html:not([data-theme="light"]) .detail,html:not([data-theme="light"]) .term,html:not([data-theme="light"]) .lcard,html:not([data-theme="light"]) .detail details[open]{backdrop-filter:none;-webkit-backdrop-filter:none}
+/* Panels that sit directly on the backdrop (step cells, accordions, the tips strip, the drop
+   zone) were 2-4% translucent washes. Over flat paper that reads as a tint; over a photograph
+   it reads as a patchy window - which is what made their edges look unresolved. They get an
+   opaque recessed surface a shade under the card tone, so the hairline is the only edge. */
+html:not([data-theme="light"]){--surf:#1d1d1d;--surf2:#252525}
+html:not([data-theme="light"]) .tips,html:not([data-theme="light"]) .steps2,html:not([data-theme="light"]) .faq details,html:not([data-theme="light"]) .drop{background:var(--surf)}
+html:not([data-theme="light"]) .drop:hover{background:var(--surf2)}
+html:not([data-theme="light"]) .drop.hot{background:var(--surf2)}
+html:not([data-theme="light"]) body>header{border-bottom-color:rgba(255,255,255,.07);box-shadow:0 1px 0 rgba(255,255,255,.03) inset,0 10px 30px -18px rgba(0,0,0,.5)}
+html:not([data-theme="light"]) .navlinks a:hover{text-shadow:none}
+html:not([data-theme="light"]) .tbtn:hover{color:var(--txt);border-color:var(--line2);box-shadow:none}
+html:not([data-theme="light"]) .band:hover,html:not([data-theme="light"]) .detail:hover,html:not([data-theme="light"]) .term:hover{border-color:var(--line2)}
+html:not([data-theme="light"]) select,html:not([data-theme="light"]) .hexin,html:not([data-theme="light"]) .sendrow input#tsend{background-color:color-mix(in srgb,var(--txt) 3%,transparent)}
+html:not([data-theme="light"]) select:hover{border-color:var(--line2)}
+html:not([data-theme="light"]) .drop:hover{border-color:var(--line2);color:var(--txt);background:color-mix(in srgb,var(--txt) 4%,transparent)}
+html:not([data-theme="light"]) .drop.hot{border-color:var(--line2);background:color-mix(in srgb,var(--txt) 6%,transparent)}
+html:not([data-theme="light"]) .dchip.ok{border-color:var(--line2);background:color-mix(in srgb,var(--txt) 5%,transparent)}
+html:not([data-theme="light"]) a.dl:hover{border-color:var(--line2);background:color-mix(in srgb,var(--txt) 4%,transparent);box-shadow:none}
+html:not([data-theme="light"]) .term .row button:hover:not(:disabled){border-color:var(--line2);background:color-mix(in srgb,var(--txt) 5%,transparent);box-shadow:none}
+html:not([data-theme="light"]) .conbtns button:hover{color:var(--txt);border-color:var(--line2);background:color-mix(in srgb,var(--txt) 5%,transparent)}
+html:not([data-theme="light"]) .bar .zbtn:hover{border-color:var(--line2);background:color-mix(in srgb,var(--txt) 6%,transparent)}
+html:not([data-theme="light"]) #zoomrange::-webkit-slider-thumb{box-shadow:none}
+html:not([data-theme="light"]) h2.sec::before{background:rgba(var(--acc),.8);box-shadow:none;animation:none}
+html:not([data-theme="light"]) h2.sec::after{background:linear-gradient(90deg,rgba(255,255,255,.13),transparent)}
+html:not([data-theme="light"]) .hb-status i{box-shadow:none;animation:none}
+html:not([data-theme="light"]) .tipslab{color:var(--mut);background:color-mix(in srgb,var(--txt) 3.5%,transparent)}
+html:not([data-theme="light"]) .tipslab::before{background:rgba(var(--acc),.75);box-shadow:none}
+html:not([data-theme="light"]) .detail details[open]{border-color:var(--line2)}
+html:not([data-theme="light"]) details[open] summary{border-bottom-color:var(--line)}
+html:not([data-theme="light"]) details[open] summary:hover::after{border-color:var(--line2)}
+html:not([data-theme="light"]) footer{background:linear-gradient(180deg,rgba(255,255,255,.02),transparent 58%);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)}
+/* accent stays ink, never light: outlined pills keep the cyan text but lose the cyan edge */
+html:not([data-theme="light"]) .badge{border-color:rgba(255,255,255,.15);background:color-mix(in srgb,var(--txt) 4%,transparent)}
+html:not([data-theme="light"]) .warn{border-color:rgba(255,255,255,.06);background:color-mix(in srgb,var(--txt) 2.5%,transparent)}
+html:not([data-theme="light"]) .dot.on{box-shadow:none}
+html:not([data-theme="light"]) button.solid:hover,html:not([data-theme="light"]) .term .row button.primary:hover:not(:disabled){border-color:rgba(255,255,255,.6)}
+/* the log box keeps its phosphor ink but drops the ambient green bloom */
+html:not([data-theme="light"]) #console{background-image:linear-gradient(180deg,rgba(74,222,128,.035),transparent 22%),repeating-linear-gradient(0deg,transparent 0 2px,rgba(255,255,255,.02) 2px 4px);box-shadow:inset 0 1px 0 rgba(255,255,255,.05),inset 0 3px 14px rgba(0,0,0,.5)}
+html{scroll-behavior:smooth;font-size:14px}
+::selection{background:#e8e8e8;color:#111}
+body{font-family:var(--fui);font-size:1rem;margin:0;color:var(--txt);line-height:1.35;background-color:var(--bg);background-image:radial-gradient(900px 320px at 50% -130px,rgba(150,160,175,.06),transparent 65%),radial-gradient(1200px 560px at 50% 112%,var(--bloom),transparent 70%),radial-gradient(1000px 600px at 50% 30%,rgba(150,160,175,.04),transparent 65%),radial-gradient(900px 300px at 50% -90px,var(--glowtop) 0%,transparent 62%),linear-gradient(rgba(148,184,228,.014) 1px,transparent 1px),linear-gradient(90deg,rgba(148,184,228,.014) 1px,transparent 1px);background-size:auto,auto,auto,auto,56px 56px,56px 56px;background-attachment:fixed}
+body>header{background:color-mix(in srgb,var(--bg) 72%,transparent);backdrop-filter:blur(24px) saturate(1.4);-webkit-backdrop-filter:blur(24px) saturate(1.4);border-bottom:1px solid rgba(var(--acc),.08);padding:10px 0;position:sticky;top:0;z-index:50;box-shadow:0 1px 0 rgba(255,255,255,.04) inset,0 14px 40px -12px rgba(0,0,0,.5)}
+.bhead{position:static}
+nav{width:min(1800px,94%);margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:10px}
+.logo{font-family:var(--fpx);font-weight:400;font-size:.68rem;letter-spacing:.04em;color:var(--txt);text-decoration:none;display:flex;align-items:center}
+.logo em{font-style:normal;color:var(--btnink);background:var(--btnbg);border-radius:var(--r-sm);padding:1px 7px;margin-right:9px;font-size:.9rem;box-shadow:0 1px 2px rgba(0,0,0,.12),inset 0 1px 0 rgba(255,255,255,.3)}
+.navlinks{display:flex;align-items:center;gap:16px;font-family:var(--fpx);font-size:.68rem;font-weight:400;letter-spacing:.04em}
+.navlinks a{color:var(--mut);text-decoration:none;display:inline-flex;align-items:center;transition:color .2s}
+.navlinks a:hover{color:var(--txt);text-shadow:0 0 20px rgba(var(--acc),.25)}
+.navlinks svg{width:16px;height:16px;fill:var(--mut)}
+.navlinks a:hover svg{fill:var(--txt)}
+.tbtn{font-family:var(--fpx);font-size:.62rem;font-weight:400;letter-spacing:.04em;background:color-mix(in srgb,var(--txt) 3%,transparent);color:var(--mut);border:var(--ctl-line);border-radius:var(--r-sm);padding:6px 9px;min-width:56px;text-align:center;cursor:pointer;transition:border-color .18s,color .18s,box-shadow .18s}
+.tbtn:hover{color:var(--txt);border-color:rgba(var(--acc),.3);box-shadow:0 0 16px rgba(var(--acc),.08)}
+.tbtn:active,.conbtns button:active,button.line:active{transform:translateY(1px)}
+main{width:min(1800px,94%);margin:0 auto;padding-bottom:24px;position:relative;z-index:1}
+/* hero: a compact instrument faceplate - title, one line of copy, spec bar */
+.hero{position:relative;text-align:center;padding:28px 12px 0;overflow:hidden;isolation:isolate}
+/* declared first so the decorative layers below can override position/z-index */
+.hero>*{position:relative;z-index:1}
+/* hero backdrop: an engineering grid only - the old dot field, scan sweep, bloom,
+   edge beams and lamp are gone. Restraint is what makes it read as a tool. */
+/* dark theme: filament artwork without the grid layers, calmer atmosphere scrim */
+html:not([data-theme="light"]) body{background-image:radial-gradient(900px 320px at 50% -130px,rgba(150,160,175,.06),transparent 65%),radial-gradient(1200px 560px at 50% 112%,var(--bloom),transparent 70%),radial-gradient(1000px 600px at 50% 30%,rgba(150,160,175,.04),transparent 65%),radial-gradient(900px 300px at 50% -90px,var(--glowtop) 0%,transparent 62%);background-size:auto,auto,auto,auto}
+html:not([data-theme="light"]) body::after{background:linear-gradient(100deg,rgba(11,11,13,.22) 0%,rgba(11,11,13,.12) 30%,rgba(11,11,13,.03) 55%,transparent 75%)}
+.hero-grid{position:absolute;inset:0;z-index:0;pointer-events:none;background-image:linear-gradient(90deg,var(--gridline) 1px,transparent 1px),linear-gradient(180deg,var(--gridline) 1px,transparent 1px);background-size:clamp(44px,4.4vw,76px) clamp(44px,4.4vw,76px);-webkit-mask-image:radial-gradient(112% 88% at 50% -12%,#000 8%,transparent 72%);mask-image:radial-gradient(112% 88% at 50% -12%,#000 8%,transparent 72%)}
+.hero h1{margin:0 0 13px;font-family:var(--fpx);font-weight:400;font-size:clamp(1.95rem,1rem + 2.9vw,3.45rem);line-height:1.1;letter-spacing:.01em;color:var(--txt);text-wrap:balance;animation:heroIn .7s cubic-bezier(.16,1,.3,1) both}
+@keyframes heroIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+.hero p{color:var(--mut);margin:0 auto;max-width:720px;font-size:.8rem;line-height:1.5;opacity:.7}
+/* minimal info bar: facts, not cards */
+.hero-bar{display:inline-flex;align-items:center;gap:12px;margin:11px auto 0;font-family:var(--fpx);font-size:.58rem;letter-spacing:.05em;text-transform:uppercase;color:var(--mut)}
+.hero-bar span{white-space:nowrap}
+.hb-status{display:inline-flex;align-items:center;gap:7px;color:var(--txt)}
+.hb-status i{width:6px;height:6px;border-radius:50%;background:#4ade80;box-shadow:0 0 10px rgba(74,222,128,.7);animation:dotPulse 2.6s ease-in-out infinite}
+.hb-sep{width:3px;height:3px;border-radius:50%;background:var(--line2)}
+/* merged control band - board selection and flash share one instrument surface */
+.band{grid-area:band;position:relative;background:var(--cardbg);border:var(--cardline);border-radius:var(--r);padding:14px 16px;overflow:clip;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px 24px;align-items:start;box-shadow:var(--cardsh);backdrop-filter:blur(16px) saturate(1.3);-webkit-backdrop-filter:blur(16px) saturate(1.3);transition:border-color .25s,box-shadow .3s,transform .25s}
+.band:hover{box-shadow:0 0 0 1px var(--edge-h),var(--cardsh-h)}
+/* Smooth edges: a CSS border renders as a stroked path (jagged at curves). A box-shadow
+   ring renders as a filled shape — same 1px visual, but the anti-aliasing follows the
+   border-radius much more cleanly. The border stays for box-sizing but goes transparent. */
+.band,.detail,.term,.lcard{border-color:transparent;box-shadow:0 0 0 1px var(--edge),var(--cardsh)}
+.detail:hover,.term:hover{box-shadow:0 0 0 1px var(--edge-h),var(--cardsh-h)}
+.band::before{content:"";position:absolute;left:16px;right:16px;top:0;height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,.14) 22%,rgba(255,255,255,.14) 78%,transparent);pointer-events:none}
+.band::after{content:"";position:absolute;inset:0;border-radius:inherit;background:radial-gradient(620px 130px at 10% 0%,rgba(255,255,255,.03),transparent 72%);pointer-events:none}
+.zone{min-width:0}
+.zone-flash{border-left:1px solid var(--line);padding-left:20px}
+.zone .fields{display:grid;grid-template-columns:112px minmax(0,1fr);gap:12px}
+#prebuiltFields{grid-template-columns:140px minmax(0,1fr)}
+.band .row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px}
+.band .row>esp-web-install-button{flex:none}
+.band .flashmeta{margin-top:0;gap:4px}
+.band .flashmeta code{padding:1px 5px;font-size:.78rem}
+/* port tips: the three things that actually go wrong, as one hairline-divided strip */
+.tips{grid-column:1/-1;display:grid;grid-template-columns:auto repeat(3,minmax(0,1fr));border:var(--hair);border-radius:var(--r-in);background:color-mix(in srgb,var(--txt) 2%,transparent);overflow:hidden}
+.tipslab{display:flex;align-items:center;gap:8px;padding:10px 14px;font-family:var(--fpx);font-size:.56rem;letter-spacing:.09em;text-transform:uppercase;color:rgba(var(--acc),.95);background:rgba(var(--acc),.05);white-space:nowrap}
+.tipslab::before{content:"";flex:none;width:7px;height:7px;border-radius:50%;background:rgba(var(--acc),.85);box-shadow:0 0 10px rgba(var(--acc),.55)}
+.tip{display:flex;align-items:center;gap:6px;flex-wrap:wrap;min-width:0;padding:10px 14px;border-left:var(--hair);font-size:.8rem;line-height:1.55;color:var(--mut)}
+.tip b{color:var(--txt);font-weight:600}
+.tip kbd{font-family:var(--fpx);font-size:.56rem;letter-spacing:.07em;color:var(--txt);background:color-mix(in srgb,var(--txt) 6%,transparent);border:var(--ctl-line);border-radius:var(--r-sm);padding:2px 6px}
+/* firmware source switch */
+.seg{display:inline-flex;gap:2px;padding:2px;border:var(--hair);border-radius:999px;background:color-mix(in srgb,var(--txt) 3%,transparent);margin-left:auto}
+.seg button{font-family:var(--fpx);font-size:.58rem;letter-spacing:.05em;text-transform:uppercase;color:var(--mut);background:transparent;border:0;border-radius:999px;padding:4px 11px;cursor:pointer;transition:all .2s}
+.seg button:hover{color:var(--txt);background:color-mix(in srgb,var(--txt) 5%,transparent)}
+.seg button[aria-pressed="true"]{color:var(--btnink);background:var(--btnbg);box-shadow:0 1px 2px rgba(0,0,0,.12),inset 0 1px 0 rgba(255,255,255,.3)}
+/* custom .bin upload */
+.zone .fields.customf{grid-template-columns:minmax(0,1.35fr) minmax(0,.8fr) minmax(0,.8fr)}
+.drop{position:relative;display:flex;align-items:center;gap:10px;min-height:73px;padding:9px 30px 9px 11px;border:var(--dash);border-radius:var(--r-in);background:color-mix(in srgb,var(--txt) 2%,transparent);color:var(--mut);cursor:pointer;transition:all .2s;overflow:hidden}
+.drop:hover,.drop.hot{border-color:rgba(var(--acc),.5);color:var(--txt);background:rgba(var(--acc),.03)}
+.drop.hot{background:rgba(var(--acc),.06);border-style:solid}
+.drop input{position:absolute;width:1px;height:1px;opacity:0;pointer-events:none}
+.drop svg{width:20px;height:20px;flex:none;stroke:currentColor;fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.drop .dtxt{font-size:.8rem;line-height:1.35;min-width:0;overflow-wrap:anywhere}
+.drop .dtxt b{color:var(--txt);font-weight:600;display:block;font-size:.84rem}
+.drop .dfile{display:block;max-width:100%;font-family:var(--fmono);font-size:.76rem;color:var(--txt);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.3}
+.dchips{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-top:5px}
+.dchip{display:inline-flex;align-items:center;gap:5px;font-family:var(--fpx);font-size:.56rem;letter-spacing:.05em;text-transform:uppercase;color:var(--mut);border:var(--hair);border-radius:999px;padding:2px 7px;background:color-mix(in srgb,var(--txt) 3%,transparent);white-space:nowrap}
+.dchip.ok{color:var(--txt);border-color:rgba(var(--acc),.35);background:rgba(var(--acc),.05)}
+.dchip.bad{border-color:rgba(229,115,115,.3);color:#e58b8b;background:rgba(229,115,115,.05)}
+.dropcell{position:relative}
+.visin{position:absolute;width:1px;height:1px;opacity:0;pointer-events:none}
+.dx{position:absolute;top:6px;right:6px;width:22px;height:22px;flex:none;display:grid;place-items:center;border:var(--ctl-line);border-radius:var(--r-sm);background:transparent;color:var(--mut);cursor:pointer;padding:0;font-size:.7rem;transition:all .2s}
+.dx:hover{color:var(--txt);border-color:rgba(229,115,115,.4);background:rgba(229,115,115,.06)}
+.hexin{font-family:var(--fmono);font-size:.82rem;background:rgba(var(--acc),.03);color:var(--txt);border:var(--ctl-line);border-radius:var(--r-ctl);height:var(--h-ctl);padding:0 12px;width:100%;transition:border-color .18s,background .18s,box-shadow .18s}
+.hexin:focus{outline:none;border-color:rgba(var(--acc),.4);box-shadow:0 0 0 3px rgba(var(--acc),.08)}
+.ptable{width:100%;border-collapse:collapse;font-size:.8rem;margin-top:10px}
+.ptable th,.ptable td{border:1px solid var(--line2);padding:6px 8px;text-align:left}
+.ptable th{background:var(--codebg);color:var(--txt);font-family:var(--fpx);font-size:.58rem;letter-spacing:.06em;text-transform:uppercase;font-weight:400}
+.ptable code{font-size:.76rem}
+.plist{margin:12px 0 0;padding-left:18px;font-size:.85rem;color:var(--mut);line-height:1.62}
+.plist b{color:var(--txt)}
+.plist code{font-size:.78rem}
+/* serial console prompt */
+.sendrow{margin-top:8px;margin-bottom:0}
+.psym{font-family:var(--fmono);color:#4ade80;font-size:1rem;flex:none;opacity:.8}
+.sendrow input#tsend{flex:1 1 auto;min-width:0;background:rgba(var(--acc),.03);color:var(--txt);border:var(--ctl-line);border-radius:var(--r-ctl);height:var(--h-ctl);padding:0 12px;font-family:var(--fmono);font-size:.8rem;transition:border-color .18s,background .18s,box-shadow .18s}
+.sendrow input#tsend:focus{outline:none;border-color:rgba(var(--acc),.4);box-shadow:0 0 0 3px rgba(var(--acc),.08)}
+.sendrow input#tsend:disabled{opacity:.5;cursor:not-allowed}
+.term .row.sendrow select,.term .row.sendrow button{flex:none;width:auto}
+.term .row.sendrow select{padding:0 28px 0 10px;background-position:right 9px center}
+.term .row.sendrow button{padding:0 16px}
+.sendrow{position:relative}
+.term .row.sendrow button.teolinfo{width:24px;height:24px;flex:none;padding:0;border-radius:50%;background:transparent;border:var(--ctl-line);color:var(--mut);font-family:var(--fui);font-style:italic;font-size:.75rem;line-height:1;cursor:pointer}
+.term .row.sendrow button.teolinfo:hover{color:var(--txt);border-color:var(--line2)}
+.teolpop{position:absolute;right:0;bottom:calc(100% + 8px);z-index:6;width:min(290px,94%);background:color-mix(in srgb,var(--panel) 96%,transparent);border:1px solid var(--line2);border-radius:var(--r-in);box-shadow:0 18px 44px -14px rgba(0,0,0,.6);padding:11px 12px;font-size:.78rem;line-height:1.6;color:var(--mut);display:flex;flex-direction:column;gap:6px}
+.teolpop b{color:var(--txt)}
+.teolpop button{align-self:flex-end;height:28px;padding:0 12px;border-radius:var(--r-sm);border:1px solid rgba(255,255,255,.18);background:var(--btnbg);color:var(--btnink);font-family:var(--fpx);font-size:.58rem;cursor:pointer}
+.field label{display:block;font-family:var(--fpx);font-size:.62rem;letter-spacing:.05em;text-transform:uppercase;color:var(--faint);margin:0 0 9px;font-weight:400}
+select{width:100%;background-color:rgba(var(--acc),.03);color:var(--txt);border:var(--ctl-line);border-radius:var(--r-ctl);padding:10px 30px 10px 12px;font-size:.88rem;font-weight:500;font-family:var(--fui);appearance:none;-webkit-appearance:none;cursor:pointer;transition:border-color .18s,background .18s,box-shadow .18s;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23a3a3a3' stroke-width='2' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center}
+select:hover{border-color:rgba(var(--acc),.3)}
+select:focus{outline:none;border-color:rgba(var(--acc),.4);box-shadow:0 0 0 3px rgba(var(--acc),.08)}
+/* keep the native option list on-theme so it stays readable in both themes */
+select option{background:var(--panel);color:var(--txt)}
+.detail{position:relative;grid-area:board;background:var(--cardbg);border:var(--cardline);border-radius:var(--r);padding:14px;margin:0;width:100%;overflow:clip;display:flex;flex-direction:column;min-height:0;transition:border-color .25s,box-shadow .3s,transform .25s;box-shadow:var(--cardsh);backdrop-filter:blur(16px) saturate(1.3);-webkit-backdrop-filter:blur(16px) saturate(1.3)}
+.detail:hover{border-color:rgba(var(--acc),.25);box-shadow:var(--cardsh-h)}
+.detail h2{margin:0;font-family:var(--fpx);font-weight:400;font-size:.75rem;line-height:1.7}
+.dhead{display:flex;align-items:center;gap:12px;flex-wrap:wrap;min-height:24px}
+.dmeta{margin-left:auto;font-family:var(--fpx);font-weight:400;font-size:.58rem;letter-spacing:.09em;text-transform:uppercase;color:var(--faint);white-space:nowrap;cursor:zoom-in}
+.dmeta:hover{color:var(--txt)}
+.badge{display:inline-block;font-family:var(--fpx);font-weight:400;font-size:.6rem;letter-spacing:.03em;border:1px solid rgba(var(--acc),.3);border-radius:999px;padding:2px 10px;margin-left:10px;color:rgba(var(--acc),.9);vertical-align:middle;background:rgba(var(--acc),.06)}
+.desc{color:var(--mut);font-size:.95rem;margin:6px 0 4px}
+.btnrow{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+button.solid{background:var(--btnbg);color:var(--btnink);border:1px solid rgba(255,255,255,.18);border-radius:var(--r-ctl);height:var(--h-ctl);padding:0 18px;cursor:pointer;font-family:var(--fpx);font-weight:400;font-size:.7rem;line-height:1.2;white-space:nowrap;transition:all .2s ease;box-shadow:0 1px 2px rgba(0,0,0,.15),inset 0 1px 0 rgba(255,255,255,.4)}
+button.solid:hover{transform:translateY(-1px);box-shadow:0 4px 16px rgba(var(--acc),.15),0 1px 2px rgba(0,0,0,.15),inset 0 1px 0 rgba(255,255,255,.4);border-color:rgba(var(--acc),.3)}
+button.solid:active{transform:translateY(0);filter:none;box-shadow:inset 2px 2px 6px rgba(20,30,35,.25)}
+#fbaud{width:auto;min-width:0;flex:none;height:var(--h-ctl);padding:0 30px 0 12px;font-size:.85rem;background-position:right 10px center}
+html:not([data-theme="light"]) button.solid,html:not([data-theme="light"]) .term .row button.primary{background:linear-gradient(180deg,rgba(255,255,255,.95),rgba(255,255,255,.7));color:#161616;border:1px solid rgba(255,255,255,.55);box-shadow:0 2px 8px rgba(0,0,0,.45),inset 0 1px 0 rgba(255,255,255,.95);backdrop-filter:blur(8px);transition:border-color .18s,background .18s,color .18s,transform .15s,box-shadow .25s,filter .2s}
+html:not([data-theme="light"]) button.solid:hover,html:not([data-theme="light"]) .term .row button.primary:hover:not(:disabled){filter:brightness(1.06);box-shadow:0 3px 12px rgba(0,0,0,.5),inset 0 1px 0 rgba(255,255,255,.95)}
+button.line{background:transparent;color:var(--txt);font-family:var(--fpx);font-size:.65rem;border:1px solid var(--line2);border-radius:var(--r-ctl);height:var(--h-ctl);padding:0 14px;white-space:nowrap;cursor:pointer;transition:border-color .15s,background .15s}
+button.line:hover{border-color:var(--txt);background:rgba(128,128,128,.12)}
+button:focus-visible,a:focus-visible,select:focus-visible,summary:focus-visible{outline:2px solid rgba(var(--acc),.5);outline-offset:2px;box-shadow:0 0 0 4px rgba(var(--acc),.08)}
+#console:focus-visible{outline:2px solid rgba(74,222,128,.45);outline-offset:-2px}
+*::selection{background:rgba(var(--acc),.2);color:var(--txt)}
+a.dl{color:var(--txt);text-decoration:none;border:var(--ctl-line);border-radius:var(--r-ctl);height:var(--h-ctl);padding:0 12px;font-family:var(--fpx);font-size:.62rem;font-weight:400;display:inline-flex;align-items:center;justify-content:center;gap:7px;flex:1 1 auto;margin-left:0;max-width:100%;min-width:0;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;text-align:center;background:color-mix(in srgb,var(--txt) 3%,transparent);transition:all .2s}
+a.dl:hover{border-color:rgba(var(--acc),.3);background:rgba(var(--acc),.05);box-shadow:0 0 20px rgba(var(--acc),.06)}
+a.dl:active{transform:translateY(0)}
+.dlfile{font-family:var(--fmono);font-size:.76rem;white-space:nowrap;min-width:0;overflow:hidden;text-overflow:ellipsis}
+.dlk{flex:none;color:var(--mut)}
+.dlsize{flex:none;font-family:var(--fmono);font-size:.68rem;color:var(--mut);padding-left:9px;border-left:var(--hair)}
+.missing{color:var(--txt);font-size:.9rem;border:1px dashed var(--line2);border-radius:var(--r-in);padding:10px 12px;margin-top:12px;background:var(--soft)}
+.fwempty{padding:6px 2px}
+.fwempty h3{margin:2px 0 6px;font-family:var(--fpx);font-size:.72rem;letter-spacing:.05em;color:var(--txt)}
+.fwempty p{margin:0 0 10px;color:var(--mut);font-size:.92rem}
+.fwempty p.hint{margin:10px 0 0;font-size:.85rem}
+.fwchips{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 4px}
+.fwchip{font-family:var(--fpx);font-size:.62rem;letter-spacing:.03em;color:var(--txt);background:color-mix(in srgb,var(--txt) 7%,transparent);border:var(--ctl-line);border-radius:var(--r-ctl);padding:8px 12px;cursor:pointer;transition:border-color .15s,background .15s,transform .12s}
+.fwchip:hover{border-color:var(--mut);transform:translateY(-1px)}
+.fwchip:active{transform:translateY(0)}
+/* schematic frame: the image sits in normal flow at width:100% with height:auto, so the
+   frame's height is derived from the diagram's own aspect ratio (1898x1028 = 1.8463) plus
+   the 8px padding and 1px border. No fixed height, no blank white area above/below the
+   drawing, and because the frame has no fixed height the image can never overflow it. */
+.shot{position:relative;background:#fff;border:1px solid color-mix(in srgb,var(--line2) 75%,transparent);border-radius:var(--r-in);padding:8px;margin:10px auto 0;width:100%;max-width:100%;height:auto;flex:none;display:block;box-shadow:var(--platesh)}
+/* the plate is clickable, so advertise it on hover without stealing the click */
+.shot::after{content:"click to zoom";position:absolute;right:14px;bottom:14px;font-family:var(--fpx);font-size:.56rem;letter-spacing:.06em;text-transform:uppercase;color:#3b4450;background:rgba(255,255,255,.94);border:1px solid rgba(20,30,45,.14);border-radius:999px;padding:4px 10px;opacity:0;transition:opacity .18s;pointer-events:none}
+.shot:hover::after,.shot:focus-within::after{opacity:1}
+.shot img{display:block;width:100%;height:auto;max-width:100%;object-fit:contain;cursor:zoom-in;transition:filter .18s}
+.shot img:hover{filter:brightness(1.04)}
+.hint{font-size:.85rem;color:var(--mut);margin-top:4px;overflow-wrap:anywhere}
+.term .hint{font-size:.9rem}
+.flashmeta{display:grid;gap:5px;margin-top:8px}
+.fmrow{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.fmrow>span{font-size:.62rem;font-weight:700;letter-spacing:.1em;color:var(--faint);min-width:82px}
+.fmrow code{overflow-wrap:anywhere}
+/* wiring guide = bottom sheet inside the board card: the summary bar stays in flow, while
+   the open panel is lifted out of the flow (absolute, anchored to the card's bottom) so
+   opening it can never grow the card, the grid row or the page - the pin tables scroll
+   inside the panel instead. .detail::after reserves the bar's slot while the panel is
+   open, so toggling the guide causes no layout shift at all. */
+.detail details{position:relative;margin-top:8px;border:var(--ctl-line);border-radius:var(--r-in);padding:0;overflow:hidden;background:color-mix(in srgb,var(--txt) 2%,transparent)}
+.detail details[open]{position:absolute;left:14px;right:14px;bottom:14px;z-index:6;margin:0;max-height:min(55vh,500px,calc(100% - 28px));display:block;overflow-y:auto;overflow-x:hidden;overscroll-behavior:contain;border:1px solid rgba(var(--acc),.3);border-radius:var(--r-in);background:linear-gradient(175deg,color-mix(in srgb,var(--panel) 96%,transparent),color-mix(in srgb,var(--panel2) 98%,transparent));backdrop-filter:blur(14px) saturate(1.25);-webkit-backdrop-filter:blur(14px) saturate(1.25);box-shadow:0 -12px 44px -18px rgba(0,0,0,.8),0 8px 28px -14px rgba(0,0,0,.6)}
+/* newer Chrome wraps the details content in an internal ::details-content box; flatten it so
+   .guide is a direct child of the scrolling panel (older browsers have no wrapper at all). */
+.detail details[open]::details-content{display:contents}
+/* the reserve must match the closed bar exactly (8px top margin + 2px border + 38px summary),
+   so toggling the guide shifts the card, the grid row and the page by 0px. */
+.detail:has(> details[open])::after{content:"";flex:none;height:40px;margin-top:8px}
+details summary{cursor:pointer;color:var(--txt);font-family:var(--fpx);font-size:.68rem;letter-spacing:.04em;font-weight:400;height:38px;padding:0 12px;box-sizing:border-box;list-style:none;display:flex;align-items:center;gap:8px;flex:none}
+details summary::-webkit-details-marker{display:none}
+details summary::before{content:"+";display:inline-grid;place-items:center;width:20px;height:20px;border:var(--ctl-line);border-radius:var(--r-sm);font-size:.85rem;color:var(--mut);flex:none;transition:all .2s}
+details[open] summary::before{content:"–"}
+details summary:hover{background:color-mix(in srgb,var(--txt) 4%,transparent)}
+/* the open panel scrolls (see .detail details[open]), so the bar stays pinned to the top
+   of the panel and the close chip stays reachable however long the pin tables get */
+details[open] summary{position:sticky;top:0;z-index:2;border-bottom:1px solid rgba(var(--acc),.25);background:color-mix(in srgb,var(--panel) 97%,transparent);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
+details[open] summary::after{content:"✕ close";margin-left:auto;font-family:var(--fpx);font-size:.56rem;letter-spacing:.06em;text-transform:uppercase;color:var(--mut);border:1px solid var(--line2);border-radius:999px;padding:3px 9px;transition:color .15s,border-color .15s}
+details[open] summary:hover::after{color:var(--txt);border-color:rgba(var(--acc),.45)}
+.guide{font-size:.88rem;color:var(--txt);padding:6px 14px 14px}
+/* markdown from connections/*.md: same typographic system as the rest of the page */
+.guide h1,.guide h2,.guide h3,.guide h4{margin:16px 0 8px;font-family:var(--fpx);font-weight:400;font-size:.8rem;letter-spacing:.05em;text-transform:uppercase;color:var(--txt)}
+.guide h1:first-child,.guide h2:first-child,.guide h3:first-child{margin-top:0}
+.guide p{margin:8px 0;color:var(--mut);line-height:1.55}
+.guide ul,.guide ol{margin:8px 0;padding-left:20px}
+.guide li{margin:4px 0;color:var(--mut);line-height:1.55}
+.guide li b,.guide li strong,.guide p b,.guide p strong{color:var(--txt)}
+.guide hr{border:0;border-top:var(--hair);margin:14px 0}
+.guide table{width:100%;border-collapse:collapse;font-size:.85rem}
+/* long pin tables read far better with a zebra stripe */
+.guide tbody tr:nth-child(even){background:color-mix(in srgb,var(--txt) 3%,transparent)}
+.guide th,.guide td{border:1px solid var(--line2);padding:7px 8px;text-align:left}
+.guide th{background:var(--codebg);color:var(--txt);position:sticky;top:38px;z-index:1}
+/* modal: a real viewer - scroll or slide to zoom about the pointer, drag to pan */
+.modal{position:fixed;inset:0;background:var(--modalbg);display:none;z-index:200;overflow:hidden;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
+.modal.open{display:flex;flex-direction:column}
+.modal .bar{position:relative;z-index:2;display:flex;align-items:center;gap:10px;flex:none;padding:10px 16px;background:var(--headerbg);border-bottom:var(--hair);font-family:var(--fpx);font-size:.65rem;letter-spacing:.04em;backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px)}
+.modal #modaltitle{margin-right:auto;min-width:0;font-family:var(--fpx);font-size:.68rem;letter-spacing:.05em;text-transform:uppercase;color:var(--txt);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ztools{display:flex;align-items:center;gap:7px;flex:none}
+.bar .zbtn{display:grid;place-items:center;height:34px;padding:0 12px;background:color-mix(in srgb,var(--txt) 5%,transparent);color:var(--txt);border:var(--ctl-line);border-radius:var(--r-ctl);font-family:var(--fpx);font-size:.62rem;white-space:nowrap;cursor:pointer;transition:border-color .18s,background .18s,color .18s}
+.bar .zbtn:hover{border-color:rgba(var(--acc),.35);background:rgba(var(--acc),.07)}
+.bar .zstep{width:34px;padding:0;font-size:1rem;line-height:1}
+#zoomrange{-webkit-appearance:none;appearance:none;width:clamp(84px,13vw,168px);height:34px;margin:0;padding:0;background:transparent;cursor:pointer}
+#zoomrange::-webkit-slider-runnable-track{height:6px;border-radius:999px;border:var(--ctl-line);background:color-mix(in srgb,var(--txt) 6%,transparent)}
+#zoomrange::-webkit-slider-thumb{-webkit-appearance:none;width:14px;height:22px;margin-top:-9px;border-radius:5px;background:rgba(var(--acc),.95);box-shadow:0 0 12px rgba(var(--acc),.45)}
+#zoomrange::-moz-range-track{height:6px;border-radius:999px;background:color-mix(in srgb,var(--txt) 6%,transparent)}
+#zoomrange::-moz-range-thumb{width:14px;height:22px;border:0;border-radius:5px;background:rgba(var(--acc),.95)}
+.zval{font-family:var(--fpx);font-size:.62rem;color:var(--mut);min-width:46px;text-align:right;font-variant-numeric:tabular-nums}
+.stage{position:relative;flex:1 1 auto;min-height:0;overflow:hidden;touch-action:none;cursor:grab}
+.stage.grabbing{cursor:grabbing}
+.stage img{position:absolute;top:0;left:0;transform-origin:0 0;max-width:none;max-height:none;background:#fff;border-radius:var(--r-ctl);box-shadow:0 26px 70px rgba(0,0,0,.55);user-select:none;-webkit-user-drag:none;cursor:inherit}
+.modal .hint{flex:none;font-family:var(--fpx);font-size:.66rem;letter-spacing:.05em;text-transform:uppercase;color:var(--mut);text-align:center;margin:0;padding:10px 16px 12px}
+/* terminal */
+.term{background:var(--cardbg);border:var(--cardline);border-radius:var(--r);padding:14px;margin-top:0;overflow:clip;box-shadow:var(--cardsh);backdrop-filter:blur(16px) saturate(1.3);-webkit-backdrop-filter:blur(16px) saturate(1.3);transition:border-color .25s,box-shadow .3s,transform .25s}
+.term:hover{border-color:rgba(var(--acc),.25);box-shadow:var(--cardsh-h)}
+.term .row{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:8px}
+.term .row>esp-web-install-button{flex:none}
+.term .row:last-of-type{margin-bottom:8px}
+.term .row button,.term .row select{flex:1 1 0;min-width:0}
+.term .row.controls{flex-wrap:nowrap}.term .row.controls>.tstatus{flex:1 1 auto}.term .row.controls>select{flex:0 0 auto;width:120px}.term .row.controls>button{flex:1 1 auto;min-width:102px}
+.term select{width:auto;min-width:0;height:var(--h-ctl);padding:0 30px 0 12px;font-size:.85rem;background-position:right 10px center}
+
+.term .row button{background:#2b2f36;color:#eceff3;border:1px solid #41464f;border-radius:var(--r-ctl);padding:0 12px;height:var(--h-ctl);font-family:var(--fpx);font-size:.64rem;font-weight:400;line-height:1.2;white-space:nowrap;cursor:pointer;transition:border-color .18s,background .18s,color .18s,transform .12s}
+.term .row button:hover:not(:disabled){border-color:rgba(var(--acc),.3);background:rgba(var(--acc),.05);box-shadow:0 0 16px rgba(var(--acc),.06)}
+.term .row button:disabled{opacity:.45;cursor:not-allowed}
+.term .row button:active:not(:disabled){transform:translateY(1px);filter:none;box-shadow:inset 3px 3px 8px rgba(128,128,128,.35)}
+.term .row button.primary{background:var(--btnbg);color:var(--btnink);border:1px solid rgba(255,255,255,.18);font-weight:700;box-shadow:0 1px 2px rgba(0,0,0,.15),inset 0 1px 0 rgba(255,255,255,.4)}
+.term .row button.primary:hover:not(:disabled){box-shadow:0 4px 16px rgba(var(--acc),.15),0 1px 2px rgba(0,0,0,.15),inset 0 1px 0 rgba(255,255,255,.4);border-color:rgba(var(--acc),.3)}
+.dot{width:10px;height:10px;border-radius:2px;background:var(--line2);flex:none}
+.dot.on{background:#4ade80;box-shadow:0 0 8px rgba(74,222,128,.4)}
+.tstatus{font-family:var(--fpx);font-size:.72rem;letter-spacing:.03em;color:var(--mut);flex:1 1 auto;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+/* console: size-contained, so a long boot log scrolls inside the log box and can never
+   feed the max-content height of the terminal card or the grid row. The box simply fills
+   whatever height the schematic card gives the terminal (see the min-height below). */
+#console{background-color:#0a0a0a;background-image:linear-gradient(180deg,rgba(74,222,128,.06),transparent 25%),repeating-linear-gradient(0deg,transparent 0 2px,rgba(255,255,255,.02) 2px 4px);color:#4ade80;border:1px solid rgba(255,255,255,.05);border-radius:var(--r-in);flex:1 1 auto;min-height:260px;max-height:none;contain:size;overflow-y:auto;padding:10px 96px 10px 12px;font-family:var(--fmono);font-size:.85rem;line-height:1.5;white-space:pre-wrap;margin:0;tab-size:2;box-shadow:inset 0 1px 0 rgba(74,222,128,.08),inset 0 3px 14px rgba(0,0,0,.5),inset 0 0 50px rgba(74,222,128,.04)}
+/* side-by-side layout: the schematic card's natural height sets the grid row, so the log
+   box only needs a small usable floor and then fills the space the terminal is given -
+   the terminal matches the schematic card instead of forcing it taller. The 260px floor
+   above is kept for the stacked/mobile layout. */
+@media(min-width:981px){#console{min-height:200px}}
+#console::-webkit-scrollbar,.detail details[open]::-webkit-scrollbar{width:10px;height:10px}
+#console::-webkit-scrollbar-thumb,.detail details[open]::-webkit-scrollbar-thumb{background:#3a3a3a;border-radius:8px;border:2px solid #050505}
+#console::-webkit-scrollbar-thumb:hover,.detail details[open]::-webkit-scrollbar-thumb:hover{background:var(--mut)}
+#console::-webkit-scrollbar-track,.detail details[open]::-webkit-scrollbar-track{background:transparent}
+.conwrap{position:relative;flex:1 1 auto;display:flex;flex-direction:column;min-height:0}
+.conbtns{position:absolute;top:8px;right:8px;display:flex;gap:6px}
+.conbtns button{width:26px;height:26px;display:grid;place-items:center;background:transparent;color:#a3a3a3;border:1px solid rgba(255,255,255,.06);border-radius:var(--r-sm);cursor:pointer;padding:0;transition:all .2s}
+.conbtns button:hover{color:#fff;border-color:rgba(var(--acc),.3);background:rgba(var(--acc),.05)}
+.conbtns button.ok{color:#4ade80;border-color:rgba(74,222,128,.55)}
+.conbtns svg{width:14px;height:14px}
+code{font-family:var(--fmono);background:var(--codebg);color:var(--codetxt);padding:2px 6px;border-radius:var(--r-sm);font-size:.85em}
+.warn{border:1px solid rgba(255,255,255,.05);border-left:2px solid rgba(var(--acc),.4);border-radius:0 14px 14px 0;padding:8px 14px;font-size:.83rem;color:var(--mut);margin-top:8px;background:rgba(var(--acc),.03);line-height:1.5}
+.warn b{color:var(--txt)}
+/* footer: a spec sheet rather than a tagline - brand block, link columns, meta strip */
+footer{margin-top:22px;border-top:var(--hair);background:linear-gradient(180deg,rgba(var(--acc),.035),transparent 58%)}
+.fwrap{width:min(1800px,94%);margin:0 auto;display:grid;grid-template-columns:minmax(0,1.45fr) repeat(3,minmax(0,1fr));gap:20px 26px;padding:24px 0 20px;text-align:left}
+.fbrand{display:flex;flex-direction:column;gap:10px;min-width:0}
+.fmark{display:inline-flex;align-items:center;gap:9px;font-family:var(--fpx);font-size:.66rem;letter-spacing:.05em;color:var(--txt)}
+.fmark em{font-style:normal;color:var(--btnink);background:var(--btnbg);border-radius:var(--r-sm);padding:1px 7px;font-size:.85rem;box-shadow:0 1px 2px rgba(0,0,0,.12),inset 0 1px 0 rgba(255,255,255,.3)}
+.fbrand p{margin:0;max-width:36ch;font-size:.82rem;line-height:1.6;color:var(--faint)}
+.fcol{display:flex;flex-direction:column;gap:8px;min-width:0}
+.flab{font-family:var(--fpx);font-size:.55rem;letter-spacing:.13em;text-transform:uppercase;color:var(--mut);margin-bottom:3px}
+.fcol a{display:inline-flex;align-items:center;gap:7px;width:fit-content;font-size:.83rem;color:var(--mut);text-decoration:none;transition:color .18s}
+.fcol a:hover{color:var(--txt)}
+.fcol svg{width:13px;height:13px;flex:none;fill:currentColor}
+.fcol p{margin:0;font-size:.8rem;line-height:1.6;color:var(--faint)}
+.fcol code{font-size:.76rem}
+.fbase{border-top:var(--hair);background:color-mix(in srgb,var(--txt) 2%,transparent)}
+.fbaserow{width:min(1800px,94%);margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:8px 22px;flex-wrap:wrap;padding:11px 0;font-family:var(--fpx);font-size:.56rem;letter-spacing:.09em;text-transform:uppercase;color:var(--faint)}
+.fbaserow b{font-weight:400;color:var(--mut)}
+@media(max-width:1000px){.fwrap{grid-template-columns:1fr 1fr;gap:18px 22px}.fbrand{grid-column:1/-1}.fbrand p{max-width:54ch}}
+@media(max-width:560px){.fwrap{grid-template-columns:1fr}}
+html[data-theme="light"] footer{background:linear-gradient(180deg,rgba(74,68,55,.07),transparent 58%);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)}
+/* section labels: in-card headers, one treatment everywhere */
+h2.sec{margin:0 0 10px;font-family:var(--fpx);font-weight:400;font-size:.66rem;letter-spacing:.09em;text-transform:uppercase;color:var(--mut);display:flex;align-items:center;gap:12px;scroll-margin-top:84px}
+h2.sec::before{content:"";flex:none;width:7px;height:7px;border-radius:50%;background:rgba(var(--acc),.7);box-shadow:0 0 12px rgba(var(--acc),.5),0 0 4px rgba(var(--acc),.8);animation:dotPulse 3s ease-in-out infinite}
+@keyframes dotPulse{0%,100%{box-shadow:0 0 8px rgba(var(--acc),.4),0 0 3px rgba(var(--acc),.7)}50%{box-shadow:0 0 14px rgba(var(--acc),.6),0 0 5px rgba(var(--acc),.9)}}
+h2.sec::after{content:"";flex:1;height:1px;background:linear-gradient(90deg,rgba(var(--acc),.2),transparent)}
+/* workspace: full-width control band on top, then schematic | terminal side by side */
+.workspace{display:grid;grid-template-columns:minmax(0,44fr) minmax(0,56fr);grid-template-rows:auto minmax(0,1fr);grid-template-areas:"band band" "board terminal";gap:18px;margin-top:8px}
+.p-term{grid-area:terminal;display:flex;flex-direction:column;min-height:0}
+/* the guide is a bottom sheet overlay inside the board card, so the grid row height is
+   stable in every state and the terminal is simply stretched to the schematic card */
+@media(max-width:980px){.workspace{grid-template-columns:1fr;grid-template-rows:auto;grid-template-areas:"band" "board" "terminal";gap:16px}}
+/* band zones stack before the board name can get squeezed */
+@media(max-width:880px){.band{grid-template-columns:1fr;gap:14px}.zone-flash{border-left:0;border-top:var(--hair);padding-left:0;padding-top:14px}.band .row{margin-bottom:6px}.tips{grid-template-columns:1fr}.tipslab{border-bottom:var(--hair)}.tip{border-left:0}.tip+.tip{border-top:var(--hair)}}
+@media(max-width:560px){.zone .fields,.zone .fields.customf{grid-template-columns:1fr}}
+/* gentle entrance, skipped for reduced-motion users */
+@keyframes rise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+@media(prefers-reduced-motion:no-preference){.band{animation:rise .4s cubic-bezier(.22,1,.36,1) both}.detail{animation:rise .4s .08s cubic-bezier(.22,1,.36,1) both}.p-term{animation:rise .4s .16s cubic-bezier(.22,1,.36,1) both}}
+@media(prefers-reduced-motion:no-preference){.band:hover,.detail:hover,.term:hover{transform:translateY(-1px)}}
+@media(max-width:1180px){.term .row.controls>.tstatus{flex:1 1 100%}}
+@media(max-width:640px){.hero{padding-top:22px}.navlinks a.hideS{display:none}.term .row.controls{flex-wrap:wrap}.term .row.controls>button{min-width:0}}
+/* ===== page bands ==================================================
+   The page is a stack of full-bleed bands: an introduction, then the tool, then
+   the material that used to be crammed beside it. Each band is closed by a
+   hairline and alternates surface, so the page reads top-to-bottom instead of
+   asking a single screen to hold everything. main goes full width and every band
+   puts its content back on the same 1800px content grid via .bwrap. */
+main{width:100%;padding-bottom:0}
+.bwrap{width:min(1800px,94%);margin:0 auto}
+.band-h{position:relative;padding:50px 0;border-top:var(--hair);scroll-margin-top:84px}
+.band-h.alt{background:color-mix(in srgb,var(--txt) 2.4%,transparent)}
+.bhead{margin:0 0 22px}
+#workstation .bhead{background:transparent;border:1px solid transparent;border-radius:var(--r);padding:22px 26px;overflow:clip;box-shadow:none;backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)}
+html:not([data-theme="light"]) #workstation .bhead h2,html:not([data-theme="light"]) #workstation .bhead p{text-shadow:0 1px 14px rgba(0,0,0,.55)}
+#library .bhead{background:transparent;border:1px solid transparent;border-radius:var(--r);padding:22px 26px;overflow:clip;box-shadow:none;backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)}
+html:not([data-theme="light"]) #library .bhead h2,html:not([data-theme="light"]) #library .bhead p{text-shadow:0 1px 14px rgba(0,0,0,.55)}
+#how .bhead{background:transparent;border:1px solid transparent;border-radius:var(--r);padding:22px 26px;overflow:clip;box-shadow:none;backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)}
+html:not([data-theme="light"]) #how .bhead h2,html:not([data-theme="light"]) #how .bhead p{text-shadow:0 1px 14px rgba(0,0,0,.55)}
+#help .bhead{background:transparent;border:1px solid transparent;border-radius:var(--r);padding:22px 26px;overflow:clip;box-shadow:none;backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)}
+html:not([data-theme="light"]) #help .bhead h2,html:not([data-theme="light"]) #help .bhead p{text-shadow:0 1px 14px rgba(0,0,0,.55)}
+.bhead h2{margin-bottom:9px}
+.bhead p{margin:0;color:var(--mut);font-size:.86rem;line-height:1.6;max-width:78ch}
+/* ---- band 1: introduction. Statement left, the live selection right ---- */
+.hero.band-h{text-align:left;padding:56px 0 52px;border-top:0}
+.hgrid{display:grid;grid-template-columns:minmax(0,1.12fr) minmax(0,.88fr);gap:40px;align-items:center}
+.hero.band-h h1{font-size:clamp(1.85rem,.95rem + 2.5vw,3.1rem)}
+.cta{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:20px 0 0}
+a.solidbtn,a.linebtn{display:inline-flex;align-items:center;gap:8px;height:var(--h-ctl);padding:0 17px;border-radius:var(--r-ctl);font-family:var(--fpx);font-size:.68rem;letter-spacing:.02em;text-decoration:none;white-space:nowrap;transition:transform .15s,border-color .18s,box-shadow .2s}
+a.solidbtn{background:var(--btnbg);color:var(--btnink);border:1px solid rgba(255,255,255,.18);box-shadow:0 1px 2px rgba(0,0,0,.15),inset 0 1px 0 rgba(255,255,255,.4)}
+a.solidbtn:hover{transform:translateY(-1px)}
+a.linebtn{background:transparent;color:var(--txt);border:var(--ctl-line)}
+a.linebtn:hover{border-color:var(--line2)}
+a.linebtn[aria-disabled="true"]{color:var(--faint);border-style:dashed;cursor:not-allowed;pointer-events:none}
+.hR{min-width:0;padding:13px;background:var(--cardbg);border:var(--cardline);border-radius:var(--r);box-shadow:var(--cardsh)}
+.hcap{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px}
+.hcap em{font-style:normal;font-family:var(--fpx);font-size:.56rem;letter-spacing:.1em;text-transform:uppercase;color:var(--mut)}
+.hthumb{position:relative;aspect-ratio:16/9;background:#fff;border:1px solid color-mix(in srgb,var(--line2) 55%,transparent);border-radius:var(--r-in);overflow:hidden}
+.hthumb img{display:block;width:100%;height:100%;object-fit:contain;object-position:left center}
+.hthumb.empty{display:grid;place-items:center;background:var(--soft);color:var(--faint);font-family:var(--fpx);font-size:.58rem;letter-spacing:.06em;text-transform:uppercase;text-align:center;padding:12px}
+.hspec{display:grid;margin-top:11px}
+.hspec div{display:flex;align-items:baseline;gap:10px;padding:7px 0;border-top:var(--hair);min-width:0}
+.hspec div:first-child{border-top:0}
+.hspec span{flex:none;width:78px;font-family:var(--fpx);font-size:.54rem;letter-spacing:.09em;text-transform:uppercase;color:var(--faint)}
+.hspec b{font-weight:500;font-size:.83rem;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+/* ---- band 3: the library. One card per image in boards.js ---- */
+.libgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(196px,1fr));gap:11px}
+.lcard{display:flex;flex-direction:column;gap:8px;padding:10px;background:var(--cardbg);border:var(--cardline);border-radius:var(--r);box-shadow:var(--cardsh);transition:border-color .2s,transform .2s}
+.lcard:hover{border-color:var(--line2);transform:translateY(-1px)}
+.lthumb{aspect-ratio:16/9;background:#fff;border:1px solid color-mix(in srgb,var(--line2) 55%,transparent);border-radius:var(--r-in);overflow:hidden}
+.lthumb img{display:block;width:100%;height:100%;object-fit:cover;object-position:left center}
+.lthumb.empty{aspect-ratio:16/6;display:grid;place-items:center;background:var(--soft);color:var(--faint);font-family:var(--fpx);font-size:.52rem;line-height:1.5;letter-spacing:.05em;text-transform:uppercase;text-align:center;padding:10px}
+.lmeta{display:flex;align-items:center;gap:6px;flex-wrap:nowrap;overflow:hidden;min-width:0}
+.lmeta .badge{margin-left:0;flex:none}
+.lstatus{display:flex;align-items:center;gap:7px;font-family:var(--fpx);font-size:.56rem;letter-spacing:.08em;text-transform:uppercase;color:var(--faint)}
+.lstatus i{flex:none;width:6px;height:6px;border-radius:50%;background:#f59e0b;box-shadow:0 0 8px rgba(245,158,11,.8)}
+.badge.warn{border-color:rgba(217,119,6,.55);color:#f59e0b;background:rgba(217,119,6,.1)}
+.lgroup{font-family:var(--fpx);font-size:.5rem;letter-spacing:.09em;text-transform:uppercase;color:var(--faint);border:var(--hair);border-radius:999px;padding:2px 7px}
+.lcard h3{margin:0;font-size:.84rem;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lcard p{margin:0;color:var(--mut);font-size:.75rem;line-height:1.45;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lcard .lgo{margin-top:auto}
+.lcard .lgo button{width:100%;height:34px;font-size:.58rem}
+.lcard .lgo button:disabled{opacity:.55;cursor:not-allowed}
+.phash{display:flex;align-items:center;gap:8px;margin-top:10px;padding:8px 11px;background:color-mix(in srgb,var(--txt) 3%,transparent);border:var(--hair);border-radius:var(--r-in);font-size:.72rem;color:var(--mut)}
+.phash span{flex:none;font-family:var(--fpx);font-size:.54rem;letter-spacing:.09em;text-transform:uppercase;color:var(--faint)}
+.phash code{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:.7rem;color:var(--txt);cursor:pointer}
+.phash code:hover{text-decoration:underline}
+/* ---- band 4: steps and the command-line block ---- */
+.steps2{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(228px,1fr));background:color-mix(in srgb,var(--txt) 2%,transparent);border:var(--hair);border-radius:var(--r-in);overflow:hidden}
+.steps2 li{padding:18px;border-left:var(--hair);min-width:0}
+.steps2 li:first-child{border-left:0}
+.steps2 li>b{display:block;margin-bottom:8px;font-family:var(--fpx);font-size:.57rem;letter-spacing:.1em;text-transform:uppercase;color:rgba(var(--acc),.85)}
+.steps2 h3{margin:0 0 6px;font-size:.93rem;font-weight:600}
+.steps2 p{margin:0;color:var(--mut);font-size:.83rem;line-height:1.62}
+.cliband{margin-top:16px;background:var(--soft);border:var(--hair);border-radius:var(--r-in);overflow:hidden}
+.clitop{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:9px 14px;border-bottom:var(--hair)}
+.clitop span{font-family:var(--fpx);font-size:.56rem;letter-spacing:.09em;text-transform:uppercase;color:var(--mut)}
+.cliband code{display:block;padding:12px 14px;background:transparent;border-radius:0;font-size:.8rem;color:var(--txt);white-space:pre;overflow-x:auto}
+/* ---- band 5: troubleshooting. Scoped so it ignores the guide sheet's
+   absolute/sticky summary treatment, which only applies inside .detail ---- */
+.faq{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:10px;align-items:start}
+.faq details{background:color-mix(in srgb,var(--txt) 2.4%,transparent);border:var(--hair);border-radius:var(--r-in);overflow:hidden}
+.faq summary{height:auto;padding:11px 14px;font-family:var(--fui);font-size:.86rem;letter-spacing:0}
+.faq details[open] summary{position:static;z-index:auto;border-bottom:var(--hair);background:transparent;backdrop-filter:none;-webkit-backdrop-filter:none}
+.faq details[open] summary::after{display:none}
+.faq details>div{padding:11px 14px 14px;color:var(--mut);font-size:.84rem;line-height:1.65}
+@media(max-width:900px){.hgrid{grid-template-columns:1fr;gap:26px}}
+@media(max-width:640px){.band-h{padding:34px 0}.steps2 li{border-left:0;border-top:var(--hair)}.steps2 li:first-child{border-top:0}}
+/* dark backdrop: the filament texture, kept quiet. Two fixed layers sitting above
+   body's own background and below the content: ::before holds the image at low
+   opacity so it tints the dark theme instead of replacing its tone, and ::after
+   lifts a diagonal scrim over the left side, which is where the copy sits, so every
+   line still clears its contrast. The light theme never gets either layer. */
+/* The filament network is the visual identity of the dark theme — clearly visible behind
+   every section, giving depth and character. At 30% it's a bold backdrop that doesn't
+   fight text. The scrim is light enough that the texture shows across the full width. */
+html:not([data-theme="light"]) body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;background:url('images/bg-net-dark.jpg') center/cover no-repeat;opacity:.48}
+html:not([data-theme="light"]) body::after{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;background:linear-gradient(100deg,rgba(11,11,13,.6) 0%,rgba(11,11,13,.35) 30%,rgba(11,11,13,.1) 55%,transparent 75%)}
+/* Each viewport gets the crop the texture was actually authored for. On a 1383px
+   desktop, cover renders the landscape file at 0.63x - downscaled, so it stays
+   crisp and shows most of the pattern - while the portrait file would be upscaled
+   1.28x and read soft, which is exactly how it looked in the side-by-side. On a
+   phone it inverts: the portrait crop matches the source framing, and the landscape
+   one under cover leaves barely a fifth of the pattern visible. The scrim turns
+   vertical so it still falls where the copy sits. */
+@media(max-width:820px){
+html:not([data-theme="light"]) body::before{background-image:url('images/bg-net-dark-portrait.jpg');opacity:.4}
+html:not([data-theme="light"]) body::after{background:linear-gradient(180deg,rgba(11,11,13,.4),rgba(11,11,13,.18) 40%,rgba(11,11,13,.04) 70%,rgba(11,11,13,0))}
+}
+/* ---- introduction slideshow: the library, previewed one board at a time ---- */
+.hthumb img{transition:opacity .4s ease}
+.hthumb.fading img{opacity:0}
+.hslabel{position:absolute;left:8px;bottom:8px;right:8px;display:flex;pointer-events:none}
+.hslabel b{font-weight:400;font-family:var(--fpx);font-size:.56rem;letter-spacing:.03em;color:#eceaf4;background:rgba(10,10,14,.72);border:1px solid rgba(255,255,255,.16);border-radius:var(--r-sm);padding:3px 8px;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
+.hbar{display:flex;align-items:center;gap:8px;margin-top:10px}
+.hbar>button{flex:none;width:28px;height:24px;padding:0;display:grid;place-items:center;background:transparent;color:var(--mut);border:var(--ctl-line);border-radius:var(--r-sm);font-size:.85rem;line-height:1;cursor:pointer;transition:color .18s,border-color .18s}
+.hbar>button:hover{color:var(--txt);border-color:var(--line2)}
+.hdots{display:flex;align-items:center;gap:5px;margin:0 auto}
+.hdots button{width:16px;height:4px;padding:0;border:0;border-radius:2px;background:color-mix(in srgb,var(--txt) 24%,transparent);cursor:pointer;transition:background .2s}
+.hdots button:hover{background:color-mix(in srgb,var(--txt) 44%,transparent)}
+.hdots button[aria-current="true"]{background:rgba(var(--acc),.9)}
+.hslab{margin:13px 0 3px;font-family:var(--fpx);font-size:.54rem;letter-spacing:.1em;text-transform:uppercase;color:var(--faint)}
+@media(prefers-reduced-motion:reduce){.hthumb img{transition:none}}
+html[data-theme="light"] body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;background:url('images/bg-net-light.jpg') center/cover no-repeat;opacity:.28;transform:scaleX(-1)}
+html[data-theme="light"] .hero h1{color:#141414;text-shadow:0 1px 0 rgba(255,255,255,.55),0 0 14px rgba(232,231,226,.9)}
+html[data-theme="light"] .hero p{opacity:.9}
+html:not([data-theme="light"]) .hero h1{text-shadow:0 1px 0 rgba(0,0,0,.6),0 0 14px rgba(0,0,0,.85)}
+html:not([data-theme="light"]) .hero p{opacity:.9}
+/* helper bot: floating bubble bottom-right, panel sits under modal (200) and above header (50) */
+.botfab{position:fixed;right:16px;bottom:16px;z-index:90;width:40px;height:40px;border-radius:50%;border:1px solid rgba(255,255,255,.18);background:var(--btnbg);color:var(--btnink);font-family:var(--fpx);font-size:1rem;line-height:1;cursor:pointer;display:grid;place-items:center;box-shadow:0 8px 28px -8px rgba(0,0,0,.55),inset 0 1px 0 rgba(255,255,255,.4);transition:transform .15s}
+.botfab:hover{transform:translateY(-1px)}
+.botpanel{position:fixed;right:16px;bottom:66px;z-index:90;width:min(300px,calc(100vw - 32px));max-height:min(440px,calc(100vh - 110px));display:none;flex-direction:column;overflow:hidden;background:var(--cardbg);border:1px solid var(--edge);border-radius:var(--r);box-shadow:0 26px 60px -18px rgba(0,0,0,.65);backdrop-filter:blur(16px) saturate(1.3);-webkit-backdrop-filter:blur(16px) saturate(1.3)}
+.botpanel.open{display:flex}
+.bothead{display:flex;align-items:center;gap:8px;padding:9px 11px;border-bottom:var(--hair);font-family:var(--fpx);font-size:.58rem;letter-spacing:.07em;text-transform:uppercase;color:var(--txt)}
+.bothead small{color:var(--mut);text-transform:none;letter-spacing:0;font-family:var(--fui);font-size:.7rem}
+.bothead button{margin-left:0;background:transparent;border:var(--ctl-line);border-radius:var(--r-sm);color:var(--mut);width:22px;height:22px;font-size:.65rem;cursor:pointer}
+.bothead button:hover{color:var(--txt)}
+.bothead #botclose{margin-left:auto}
+.bothead .botinfo{margin-left:6px;width:20px;height:20px;border-radius:50%;font-family:var(--fui);font-style:italic;font-size:.72rem;line-height:1}
+.botinfo-pop{position:absolute;top:42px;left:10px;right:10px;z-index:3;display:flex;flex-direction:column;gap:7px;background:color-mix(in srgb,var(--panel) 96%,transparent);border:1px solid var(--line2);border-radius:var(--r-in);box-shadow:0 18px 44px -14px rgba(0,0,0,.6);padding:11px 12px;font-size:.78rem;line-height:1.55;color:var(--txt)}
+.botissue-pop{position:absolute;top:42px;left:10px;right:10px;z-index:4;display:flex;flex-direction:column;gap:8px;background:color-mix(in srgb,var(--panel) 97%,transparent);border:1px solid var(--line2);border-radius:var(--r-in);box-shadow:0 18px 44px -14px rgba(0,0,0,.6);padding:11px 12px;font-size:.78rem;line-height:1.55;color:var(--txt)}
+.botissue-pop label{display:flex;flex-direction:column;gap:5px;font-family:var(--fpx);font-size:.54rem;letter-spacing:.07em;text-transform:uppercase;color:var(--faint)}
+.botissue-pop input,.botissue-pop textarea{background:color-mix(in srgb,var(--txt) 4%,transparent);border:var(--ctl-line);border-radius:var(--r-sm);color:var(--txt);padding:8px 10px;font-size:.8rem;font-family:var(--fui);text-transform:none;letter-spacing:0;resize:vertical}
+.botissue-pop input:focus,.botissue-pop textarea:focus{outline:none;border-color:rgba(var(--acc),.4)}
+.botissue-pop small{font-size:.68rem;line-height:1.5;color:var(--faint)}
+.bissue-row{display:flex;gap:7px;justify-content:flex-end}
+.bissue-row button{align-self:auto;height:30px;padding:0 13px;border-radius:var(--r-sm);border:1px solid rgba(255,255,255,.18);background:var(--btnbg);color:var(--btnink);font-family:var(--fpx);font-size:.58rem;cursor:pointer}
+.bissue-row #issuecancel{background:transparent;color:var(--mut);border:var(--ctl-line)}
+.botinfo-pop b{font-weight:600}
+.botinfo-pop span{color:var(--mut)}
+.botinfo-pop span b{color:var(--txt)}
+.botinfo-pop button{align-self:flex-end;height:28px;padding:0 12px;border-radius:var(--r-sm);border:1px solid rgba(255,255,255,.18);background:var(--btnbg);color:var(--btnink);font-family:var(--fpx);font-size:.58rem;cursor:pointer}
+.botlog{flex:1 1 auto;min-height:140px;max-height:260px;overflow-y:auto;padding:10px;display:flex;flex-direction:column;gap:7px}
+.botmsg{max-width:88%;padding:7px 10px;border-radius:12px;font-size:.78rem;line-height:1.5;overflow-wrap:anywhere}
+.botmsg.bot{background:color-mix(in srgb,var(--txt) 6%,transparent);color:var(--txt);align-self:flex-start;border:1px solid var(--hair)}
+.botmsg.me{background:rgba(var(--acc),.14);color:var(--txt);align-self:flex-end;border:1px solid rgba(var(--acc),.25)}
+.botmsg a{color:inherit}
+.botchips{display:flex;gap:6px;flex-wrap:wrap;padding:0 10px 7px}
+.botchips button{font-family:var(--fpx);font-size:.54rem;letter-spacing:.04em;background:transparent;color:var(--mut);border:var(--ctl-line);border-radius:999px;padding:4px 9px;cursor:pointer}
+.botchips button:hover{color:var(--txt);border-color:var(--line2)}
+.botlist{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.botlist button{font-family:var(--fpx);font-size:.56rem;letter-spacing:.03em;background:transparent;color:var(--txt);border:var(--ctl-line);border-radius:999px;padding:5px 10px;cursor:pointer}
+.botlist button:hover{border-color:var(--line2)}
+.botvote{display:flex;align-items:center;gap:6px;margin-top:8px;padding-top:7px;border-top:1px dashed color-mix(in srgb,var(--txt) 14%,transparent);font-size:.72rem;color:var(--mut)}
+.botvote button{background:transparent;border:var(--ctl-line);border-radius:8px;padding:2px 8px;font-size:.78rem;cursor:pointer;line-height:1.4}
+.botvote button:hover{border-color:var(--line2)}
+/* ESP Web Tools renders its dialogs (Erase prompt, Install overview, progress) as
+   Material elements in the LIGHT dom — page CSS can theme them through tokens */
+md-dialog{--md-dialog-container-color:#232323;--md-dialog-container-shape:20px;--md-dialog-headline-color:#F3F3F3;--md-dialog-headline-font:'Departure Mono',monospace;--md-dialog-supporting-text-color:#969696;--md-dialog-supporting-text-font:'Inter',sans-serif;--md-dialog-scrim-color:rgba(0,0,0,.6);--md-sys-color-primary:#8fb8d8;--md-sys-color-on-primary:#101418;--md-checkbox-selected-container-color:#8fb8d8;--md-checkbox-selected-icon-color:#101418}
+md-menu{--md-menu-container-color:#232323;--md-list-item-label-text-color:#F3F3F3;--md-list-item-label-text-font:'Inter',sans-serif;--md-list-item-supporting-text-color:#969696;--md-list-item-leading-icon-color:#c9c9c9;--md-sys-color-primary:#8fb8d8}
+html[data-theme="light"] md-dialog{--md-dialog-container-color:#F0EFEB;--md-dialog-headline-color:#252525;--md-dialog-supporting-text-color:#5f6368;--md-dialog-scrim-color:rgba(40,38,34,.5);--md-sys-color-primary:#0369a1;--md-sys-color-on-primary:#ffffff;--md-checkbox-selected-container-color:#0369a1;--md-checkbox-selected-icon-color:#ffffff}
+html[data-theme="light"] md-menu{--md-menu-container-color:#F0EFEB;--md-list-item-label-text-color:#252525;--md-list-item-supporting-text-color:#5f6368;--md-list-item-leading-icon-color:#4a5a6a;--md-sys-color-primary:#0369a1}
+.botrow{display:flex;gap:6px;padding:8px 10px 10px;border-top:var(--hair)}
+.botrow input{flex:1;min-width:0;height:34px;border:var(--ctl-line);border-radius:var(--r-ctl);background:color-mix(in srgb,var(--txt) 3%,transparent);color:var(--txt);padding:0 10px;font-size:.8rem;font-family:var(--fui)}
+.botrow input:focus{outline:none;border-color:rgba(var(--acc),.4)}
+.botrow button{flex:none;height:34px;padding:0 12px;border-radius:var(--r-ctl);border:1px solid rgba(255,255,255,.18);background:var(--btnbg);color:var(--btnink);font-family:var(--fpx);font-size:.6rem;cursor:pointer}
+.botreport{padding:0 10px 9px}
+.botreport button{width:100%;height:32px;border:var(--ctl-line);border-radius:var(--r-ctl);background:transparent;color:var(--mut);font-family:var(--fpx);font-size:.58rem;letter-spacing:.04em;cursor:pointer}
+.botreport button:hover{color:var(--txt);border-color:var(--line2)}
+@media(max-width:560px){.botfab{right:12px;bottom:12px}.botpanel{right:12px;bottom:60px}}
+@media(prefers-reduced-motion:reduce){.botfab{transition:none}}
+</style>
+</head>
+<body>
+<header><nav>
+<a class="logo" href="./"><em>⚡</em>ESP Firmware Flasher</a>
+<div class="navlinks">
+<a class="hideS" href="#library">Boards</a>
+<a class="hideS" href="#flash">Flash</a>
+<a class="hideS" href="#terminal">Terminal</a>
+<a class="hideS" href="#help">Help</a>
+<button class="tbtn" id="themebtn" aria-label="Toggle light and dark theme">LIGHT</button>
+<a href="https://github.com/Aryann019x" target="_blank" rel="noopener" aria-label="GitHub"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg></a><a href="https://www.instagram.com/aryann019x/" target="_blank" rel="noopener" aria-label="Instagram"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7.0301.084c-1.2768.0602-2.1487.264-2.911.5634-.7888.3075-1.4575.72-2.1228 1.3877-.6652.6677-1.075 1.3368-1.3802 2.127-.2954.7638-.4956 1.6365-.552 2.914-.0564 1.2775-.0689 1.6882-.0626 4.947.0062 3.2586.0206 3.6671.0825 4.9473.061 1.2765.264 2.1482.5635 2.9107.308.7889.72 1.4573 1.388 2.1228.6679.6655 1.3365 1.0743 2.1285 1.38.7632.295 1.6361.4961 2.9134.552 1.2773.056 1.6884.069 4.9462.0627 3.2578-.0062 3.668-.0207 4.9478-.0814 1.28-.0607 2.147-.2652 2.9098-.5633.7889-.3086 1.4578-.72 2.1228-1.3881.665-.6682 1.0745-1.3378 1.3795-2.1284.2957-.7632.4966-1.636.552-2.9124.056-1.2809.0692-1.6898.063-4.948-.0063-3.2583-.021-3.6668-.0817-4.9465-.0607-1.2797-.264-2.1487-.5633-2.9117-.3084-.7889-.72-1.4568-1.3876-2.1228C21.2982 1.33 20.628.9208 19.8378.6165 19.074.321 18.2017.1197 16.9244.0645 15.6471.0093 15.236-.005 11.977.0014 8.718.0076 8.31.0215 7.0301.0839m.1402 21.6932c-1.17-.0509-1.8053-.2453-2.2287-.408-.5606-.216-.96-.4771-1.3819-.895-.422-.4178-.6811-.8186-.9-1.378-.1644-.4234-.3624-1.058-.4171-2.228-.0595-1.2645-.072-1.6442-.079-4.848-.007-3.2037.0053-3.583.0607-4.848.05-1.169.2456-1.805.408-2.2282.216-.5613.4762-.96.895-1.3816.4188-.4217.8184-.6814 1.3783-.9003.423-.1651 1.0575-.3614 2.227-.4171 1.2655-.06 1.6447-.072 4.848-.079 3.2033-.007 3.5835.005 4.8495.0608 1.169.0508 1.8053.2445 2.228.408.5608.216.96.4754 1.3816.895.4217.4194.6816.8176.9005 1.3787.1653.4217.3617 1.056.4169 2.2263.0602 1.2655.0739 1.645.0796 4.848.0058 3.203-.0055 3.5834-.061 4.848-.051 1.17-.245 1.8055-.408 2.2294-.216.5604-.4763.96-.8954 1.3814-.419.4215-.8181.6811-1.3783.9-.4224.1649-1.0577.3617-2.2262.4174-1.2656.0595-1.6448.072-4.8493.079-3.2045.007-3.5825-.006-4.848-.0608M16.953 5.5864A1.44 1.44 0 1 0 18.39 4.144a1.44 1.44 0 0 0-1.437 1.4424M5.8385 12.012c.0067 3.4032 2.7706 6.1557 6.173 6.1493 3.4026-.0065 6.157-2.7701 6.1506-6.1733-.0065-3.4032-2.771-6.1565-6.174-6.1498-3.403.0067-6.156 2.771-6.1496 6.1738M8 12.0077a4 4 0 1 1 4.008 3.9921A3.9996 3.9996 0 0 1 8 12.0077"/></svg></a><a href="https://www.youtube.com/@Ranger019XLab" aria-label="YouTube"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg></a>
+</div>
+</nav></header>
+<main>
+<section class="hero band-h" id="top">
+<div class="hero-grid" aria-hidden="true"></div>
+<div class="bwrap hgrid">
+<div class="hL">
+<h1>FLASH FIRMWARE FROM YOUR BROWSER</h1>
+<p>Flash firmware on ESP32 and ESP32-S3 directly from your browser. No drivers. No software. Just USB.</p>
+<div class="cta">
+<a class="solidbtn" href="#flash">⚡ Open the flasher</a>
+<a class="linebtn" href="#library">Browse the board library</a>
+</div>
+<div class="hero-bar">
+<span class="hb-status"><i aria-hidden="true"></i>Ready</span>
+<span id="boardcount">…</span>
+<span>Your .bin</span>
+<span>Chrome/Edge · USB</span>
+</div>
+</div>
+<aside class="hR" id="hR" aria-label="Board preview">
+<div class="hcap"><em>From the library</em><span class="lgroup" id="hgroup">—</span></div>
+<div class="hthumb" id="hthumb"><img id="himg" src="" alt=""><span class="hslabel"><b id="hname"></b></span></div>
+<div class="hbar">
+<button type="button" id="hprev" aria-label="Previous board">‹</button>
+<div class="hdots" id="hdots" aria-label="Preview a board"></div>
+<button type="button" id="hnext" aria-label="Next board">›</button>
+</div>
+<div class="hslab">Loaded in the flasher</div>
+<div class="hspec" id="hspec"></div>
+</aside>
+</div>
+</section>
+
+<section class="band-h" id="workstation">
+<div class="bwrap">
+<header class="bhead">
+<h2 class="sec">The workstation</h2>
+<p>Choose a firmware source, pick your board, check the wiring, then flash. The terminal below reads the boot log back at 115200.</p>
+</header>
+<div class="workspace">
+<div class="band">
+<div class="zone" id="boards">
+<h2 class="sec"><span class="seg" role="group" aria-label="Firmware source"><button type="button" id="segPre" aria-pressed="true">Prebuilt</button><button type="button" id="segCus" aria-pressed="false">Your .bin</button></span></h2>
+<div class="fields" id="prebuiltFields">
+<div class="field"><label for="group">Firmware</label><select id="group"></select></div>
+<div class="field"><label for="board">Board / firmware</label><select id="board"></select></div>
+</div>
+<div class="fields customf" id="customFields" hidden>
+<div class="field dropcell">
+<div class="drop" id="drop" role="button" tabindex="0" aria-label="Choose or drop a .bin file">
+<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 15V4m0 0L8 8m4-4l4 4"/><path d="M4 15v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3"/></svg>
+<span class="dtxt" id="droptxt"><b>Drop your .bin</b>or browse files — it never leaves your machine</span>
+</div>
+<button type="button" class="dx" id="dropclear" hidden aria-label="Remove chosen file">✕</button>
+<input type="file" id="binfile" class="visin" accept=".bin,application/octet-stream">
+</div>
+<div class="field"><label for="cchip">Chip</label><select id="cchip"></select></div>
+<div class="field"><label for="coffset">Flash offset</label><input id="coffset" class="hexin" list="offlist" value="0x0000" spellcheck="false" autocomplete="off"><datalist id="offlist"><option value="0x0000">merged image — recommended</option><option value="0x1000">bootloader</option><option value="0x8000">partition table</option><option value="0x10000">factory application</option><option value="0x290000">SPIFFS / LittleFS data</option></datalist></div>
+<div class="field partwrap"><span class="plab">Extra parts</span><div id="partlist"></div><button type="button" class="padd" id="partadd">+ Add bootloader / partition / app file</button></div>
+</div>
+</div>
+<div class="zone zone-flash">
+<h2 class="sec" id="flash">Flash</h2>
+<div class="row">
+<esp-web-install-button id="installer" manifest="manifests/manifest-esp32s3-st7789.json">
+<button class="solid" slot="activate">⚡ FLASH</button>
+<span slot="unsupported">USB flashing needs Chrome 148+ on Android, or desktop Chrome/Edge — iPhones cannot flash over USB.</span>
+</esp-web-install-button>
+<select id="fbaud" title="Baud rate written into the manual esptool command below (the web FLASH button uses its built-in rate)"><option selected>115200</option><option>230400</option><option>460800</option><option>921600</option></select>
+<a class="dl" id="dllink" href="firmware/Bruce-esp32s3-st7789.bin" download>Download .bin</a>
+</div>
+<div class="flashmeta"><div class="fmrow"><span id="fofflab">MERGED IMAGE</span><code id="foffval">0x0000</code></div><div class="fmrow"><span>MANUAL FLASH</span><code id="fmanual">esptool.py --port COMx -b 115200 write_flash 0x00000 file.bin</code></div></div>
+</div>
+<div class="tips">
+<span class="tipslab">Port tips</span>
+<span class="tip"><b>No port?</b> Hold <kbd>BOOT</kbd>, tap <kbd>RST</kbd>, release <kbd>BOOT</kbd> — then flash.</span>
+<span class="tip"><b>Port busy?</b> Close the Terminal first — one app holds it.</span>
+<span class="tip"><b>No device?</b> Chrome or Edge, plus a data-capable USB cable.</span>
+</div>
+</div>
+
+<div class="detail" id="detail"></div>
+
+<div class="term p-term">
+<h2 class="sec" id="terminal">Terminal</h2>
+<div class="row controls">
+<span class="dot" id="tdot"></span><span class="tstatus" id="tstatus">Idle — connect to view boot logs.</span>
+<button class="primary" id="tconnect">Connect</button>
+<select id="tbaud" aria-label="Baud rate"><option>115200</option><option>74880</option><option>230400</option><option>460800</option></select>
+<button id="tdisconnect" disabled>Disconnect</button>
+</div>
+<div class="conwrap">
+<pre id="console" tabindex="0">Serial output will appear here after connecting.</pre>
+<div class="conbtns">
+<button id="tsave" title="Save log to a .txt file" aria-label="Save log to file"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12m0 0l-4-4m4 4l4-4M4 19h16"/></svg></button>
+<button id="tcopy" title="Copy terminal" aria-label="Copy terminal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg></button>
+<button id="tclear" title="Clear terminal" aria-label="Clear terminal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+</div>
+</div>
+<div class="row sendrow">
+<span class="psym" aria-hidden="true">›</span>
+<input id="tsend" type="text" placeholder="Type to send to the board…" autocomplete="off" spellcheck="false" aria-label="Send text to the board" disabled>
+<select id="teol" aria-label="Line ending"><option value="crlf">CR+LF</option><option value="lf">LF</option><option value="cr">CR</option><option value="none">none</option></select>
+<button type="button" class="teolinfo" id="teolinfo" aria-label="What are these line ending options?" title="Line ending help" aria-expanded="false">i</button>
+<div class="teolpop" id="teolpop" hidden><div><b>Line ending</b> — how Send finishes your line for the board.</div><div><b>CR+LF</b> normal Enter, works almost everywhere. <b>LF</b> if replies look double-spaced. <b>CR</b> rarely needed. <b>none</b> sends raw text.</div><button type="button" id="teolok">Got it</button></div>
+<button id="tsendbtn" disabled>Send</button>
+</div>
+</div>
+</div>
+</div>
+</section>
+
+<section class="band-h alt" id="library">
+<div class="bwrap">
+<header class="bhead">
+<h2 class="sec">Board library</h2>
+<p id="libcount">Merged full-flash images are written at 0x0000.</p>
+</header>
+<div class="libgrid" id="libgrid"></div>
+</div>
+</section>
+
+<section class="band-h" id="how">
+<div class="bwrap">
+<header class="bhead">
+<h2 class="sec">Getting started</h2>
+<p>Three steps, no installer, and no file ever leaves your machine.</p>
+</header>
+<ol class="steps2">
+<li><b>01 · Select</b><h3>Pick the image and the board</h3><p>Use a prebuilt image from the library, or drop in your own merged <code>.bin</code>. The offset table in the Select panel explains what each part of an image is for.</p></li>
+<li><b>02 · Flash</b><h3>Connect over USB and hit Flash</h3><p>Chrome or Edge talks straight to the serial port. If no port shows up, hold <b>BOOT</b>, tap <b>RST</b>, release <b>BOOT</b>, then try again.</p></li>
+<li><b>03 · Verify</b><h3>Read the boot log</h3><p>Open the terminal and connect at 115200 to watch the board come up. Close the terminal before flashing — one app holds a port at a time.</p></li>
+</ol>
+<div class="cliband">
+<div class="clitop"><span>Prefer the command line?</span><button class="tbtn" id="cmdcopy" type="button">Copy command</button></div>
+<code id="clicmd">esptool.py --port COMx -b 115200 write_flash 0x00000 firmware.bin</code>
+</div>
+</div>
+</section>
+
+<section class="band-h alt" id="help">
+<div class="bwrap">
+<header class="bhead">
+<h2 class="sec">Troubleshooting</h2>
+<p>The four things that actually go wrong, and what fixes each one.</p>
+</header>
+<div class="faq">
+<details><summary>No port appears in the picker</summary><div>Hold <b>BOOT</b>, tap <b>RST</b>, release <b>BOOT</b>, then press Flash again. Boards without a USB-serial chip also need a data-capable cable — charge-only cables are the most common cause.</div></details>
+<details><summary>The port is busy</summary><div>One application owns a serial port at a time. Close the terminal on this page first, and close any other serial monitor or IDE that may be holding the port, then reconnect.</div></details>
+<details><summary>The flash failed part-way</summary><div>Reconnect at a lower baud rate, use a powered USB port rather than an unpowered hub, and make sure the image matches its offset — every prebuilt here is merged at <code>0x0000</code> (custom split files use Your .bin + Add part).</div></details>
+<details><summary>Flash succeeds but the screen stays black</summary><div>Check the wiring guide — wrong display pins give a lit-but-blank screen even when the firmware boots fine. On 16MB quad-SPI S3 modules a QIO 80MHz header watchdog-loops at boot — the S3 image here is already patched to DIO 40MHz, which the SHA-256 row reflects.</div></details>
+<details><summary>The browser says Web Serial is unsupported</summary><div>Web Serial needs a desktop Chromium browser — Chrome or Edge 89 and newer. Firefox, Safari and most mobile browsers do not implement it yet.</div></details>
+</div>
+</div>
+</section>
+
+<section class="band-h" id="discussion" hidden>
+<div class="bwrap">
+<header class="bhead">
+<h2 class="sec">Discussion</h2>
+<p>Questions, board requests and build reports, kept on GitHub Discussions.</p>
+</header>
+<div class="giscus" id="giscus"></div>
+</div>
+</section>
+
+<!-- Dev note: add firmware by dropping a .bin in firmware/ + ~8 lines in boards.js. Dropdowns, the hero and the library all update on their own. -->
+</main>
+
+<button type="button" class="botfab" id="botfab" aria-label="Open help assistant" aria-expanded="false" title="Need help flashing?">?</button>
+<div class="botpanel" id="botpanel" role="dialog" aria-label="Flashing help assistant" aria-hidden="true">
+<div class="bothead"><span>Flash helper</span><button type="button" class="botinfo" id="botinfo" aria-label="How to use this helper" title="How to use this helper" aria-expanded="false">i</button><button type="button" id="botclose" aria-label="Close assistant">✕</button></div>
+<div class="botinfo-pop" id="botinfo-pop" hidden><b>How to use this helper</b><span>Tap a chip below or type your issue — e.g. <b>no port</b>, <b>port busy</b>, <b>flash failed</b>, <b>offset</b>, <b>wiring</b>, <b>custom bin</b>, <b>which chip</b>, <b>untested</b>.</span><span>Still stuck? Hit <b>🐛 Report an issue</b> — describe it and it opens prefilled on GitHub.</span><button type="button" id="botinfo-ok">Got it</button></div>
+<div class="botissue-pop" id="botissue-pop" hidden><b>Report an issue</b><label>Title<input id="issuetitle" type="text" placeholder="e.g. No port on ESP32-S3" maxlength="120" autocomplete="off"></label><label>What happened?<textarea id="issuebody" rows="3" placeholder="Board, what you clicked, what you saw…"></textarea></label><div class="bissue-row"><button type="button" id="issuecancel">Cancel</button><button type="button" id="issueopen">Open in GitHub</button></div><small>Opens github.com prefilled — review, edit, then Submit there. Nothing is filed until you press Submit.</small></div>
+<div class="botlog" id="botlog" aria-live="polite"></div>
+<div class="botchips" id="botchips"></div>
+<div class="botreport"><button type="button" id="botissue" title="Describe the issue, then open it prefilled on GitHub">🐛 Report an issue</button></div>
+<div class="botrow"><input id="botinput" type="text" placeholder="Ask: no port, custom bin, offset…" autocomplete="off" aria-label="Ask the assistant"><button type="button" id="botsend">Send</button></div>
+</div>
+
+<div class="modal" id="modal" role="dialog" aria-modal="true" aria-labelledby="modaltitle" tabindex="-1">
+<div class="bar">
+<span id="modaltitle">Schematic</span>
+<div class="ztools" role="group" aria-label="Zoom controls">
+<button type="button" class="zbtn zstep" id="zoomout" aria-label="Zoom out" title="Zoom out (−)">−</button>
+<input type="range" id="zoomrange" min="100" max="700" step="5" value="100" aria-label="Zoom level">
+<button type="button" class="zbtn zstep" id="zoomin" aria-label="Zoom in" title="Zoom in (+)">+</button>
+<span class="zval" id="zoomval" aria-hidden="true">100%</span>
+<button type="button" class="zbtn" id="zoomfit" title="Fit to screen (0)">Fit</button>
+</div>
+<button type="button" class="zbtn" id="modalclose" aria-label="Close schematic view">Close ✕</button>
+</div>
+<div class="stage" id="stage"><img id="modalimg" src="" alt="" draggable="false"></div>
+<p class="hint">Scroll or drag the slider to zoom · drag to pan · double-click for 1:1 · Esc to close</p>
+</div>
+
+<footer>
+<div class="fwrap">
+<div class="fbrand">
+<span class="fmark"><em>⚡</em>ESP Firmware Flasher</span>
+<p>A browser-based flasher for ESP32 and ESP32-S3 boards. Upload your own .bin or use a prebuilt image. Files stream from your machine over USB — nothing is uploaded.</p>
+</div>
+<div class="fcol">
+<span class="flab">Tool</span>
+<a href="#library">Board library</a>
+<a href="#flash">Flash firmware</a>
+<a href="#terminal">Serial terminal</a>
+<a href="#how">Getting started</a>
+<a href="#help">Troubleshooting</a>
+</div>
+<div class="fcol">
+<span class="flab">Resources</span>
+
+<a href="https://esphome.github.io/esp-web-tools/">ESP Web Tools</a>
+<a href="LICENSE">MIT License</a>
+</div>
+<div class="fcol">
+<span class="flab">Good to know</span>
+<p>Merged full-flash images are written at <code>0x0000</code>.</p>
+<p>Chrome or Edge on desktop is required for Web Serial.</p>
+<p>Close the terminal before flashing — one app holds the port.</p>
+</div>
+</div>
+<div class="fbase"><div class="fbaserow"><span>Built by Aryann019x · <b>ESP Firmware Flasher</b></span><span>No uploads · files stay on your machine</span><span>Verify wiring before powering your board</span></div></div>
+</footer>
+
+<script>
+/* ===== project identity: the one place to change if this repo moves =====
+   Everything that points back at the project hangs off these two values — the
+   comments repo, the "report an issue" links and the prefilled help text. The
+   only other project-specific value is the deploy origin behind the social
+   tags, which is a static URL in <head> (see the comment there). */
+const REPO={ owner:'Aryann019x', name:'ESP-Web-Flasher' };
+const REPO_SLUG=REPO.owner+'/'+REPO.name;
+
+/* ===== Discussion band (GitHub Discussions via Giscus) =====
+   Deliberately inert: the band stays hidden and nothing is requested from
+   giscus.app until category + categoryId are filled in below. To switch it on:
+     1. repo > Settings > General > Features > enable Discussions
+     2. install the app on the repo: https://github.com/apps/giscus
+     3. fill repoId below with this repo's node id —
+        curl -s https://api.github.com/repos/<owner>/<repo> | grep node_id
+     4. read category + categoryId off https://giscus.app and paste them here
+   repoId is per-repo, so it has to be re-read every time the project moves.
+   Nothing is requested from giscus.app until all three are filled in. */
+const GISCUS={
+  repo:REPO_SLUG,
+  repoId:'',
+  category:'',      /* e.g. Announcements */
+  categoryId:'',    /* e.g. DIC_kwDOUrH_qc4C... */
+  mapping:'pathname',
+  reactions:'1',
+  inputPosition:'bottom',
+  lang:'en'
+};
+(function(){
+  const sec=document.getElementById('discussion');
+  if(!sec||!GISCUS.category||!GISCUS.categoryId) return; /* unconfigured: stay hidden */
+  sec.hidden=false;
+  let done=false;
+  function load(){
+    if(done) return; done=true;
+    const host=document.getElementById('giscus'); if(!host) return;
+    const s=document.createElement('script');
+    s.src='https://giscus.app/client.js'; s.async=true; s.crossOrigin='anonymous';
+    const d={'data-repo':GISCUS.repo,'data-repo-id':GISCUS.repoId,
+      'data-category':GISCUS.category,'data-category-id':GISCUS.categoryId,
+      'data-mapping':GISCUS.mapping,'data-strict':'0',
+      'data-reactions-enabled':GISCUS.reactions,'data-emit-metadata':'0',
+      'data-input-position':GISCUS.inputPosition,
+      'data-theme':'preferred_color_scheme','data-lang':GISCUS.lang,'data-loading':'lazy'};
+    for(const k in d) s.setAttribute(k,d[k]);
+    host.appendChild(s);
+  }
+  try{
+    /* load only once the reader actually reaches the band */
+    const io=new IntersectionObserver(es=>{ if(es.some(e=>e.isIntersecting)){ load(); io.disconnect(); } },{rootMargin:'300px'});
+    io.observe(sec);
+  }catch(e){ load(); }
+})();
+const gsel=document.getElementById('group'), bsel=document.getElementById('board');
+const detail=document.getElementById('detail');
+const installer=document.getElementById('installer'), dllink=document.getElementById('dllink');
+const modal=document.getElementById('modal'), modalimg=document.getElementById('modalimg'), modaltitle=document.getElementById('modaltitle');
+let flashBaudRate='115200';
+const fbaud=document.getElementById('fbaud');
+const BAUDS=['115200','230400','460800','921600'];
+try{ const fb=localStorage.getItem('eff-fbaud'); if(fb&&BAUDS.includes(fb)){ flashBaudRate=fb; if(fbaud) fbaud.value=fb; } }catch(e){}
+function refreshFlashCmd(){
+ const b=flashBaudRate;
+ if(source==='custom'){ const ps=collectParts(); if(ps.length){ fmanual.textContent='esptool.py --port COMx -b '+b+' write_flash '+ps.map(p=>hexAddr(p.offset)+' '+p.name).join(' '); } else if(customFile){ fmanual.textContent='esptool.py --port COMx -b '+b+' write_flash '+hexAddr(customOffset)+' '+customFile.name; } return; }
+ const f=cur(); if(f&&!f.missing){ const fn=f.file.split('/').pop(); fmanual.textContent='esptool.py --port COMx -b '+b+' write_flash '+hexAddr(fwOff(f))+' '+fn; }
+}
+if(fbaud) fbaud.onchange=()=>{ flashBaudRate=(fbaud.value&&BAUDS.includes(fbaud.value))?fbaud.value:'115200'; try{localStorage.setItem('eff-fbaud',flashBaudRate);}catch(e){} refreshFlashCmd(); };
+/* ===== schematic viewer: fit / 1:1, zoom about the pointer, drag to pan, pinch on touch ===== */
+const stage=document.getElementById('stage');
+const zoomRange=document.getElementById('zoomrange'), zoomVal=document.getElementById('zoomval');
+const ZMAX=700; /* slider units: 100% = fit-to-screen */
+const vv={s:1,base:1,tx:0,ty:0,nw:0,nh:0,ax:NaN,ay:NaN}; /* ax/ay = last hover point in stage coords */
+function vBox(){return {w:stage.clientWidth,h:stage.clientHeight};}
+function vApply(){
+ if(!vv.nw){modalimg.style.transform='';return;}
+ modalimg.style.transform='translate('+vv.tx.toFixed(2)+'px,'+vv.ty.toFixed(2)+'px) scale('+vv.s.toFixed(4)+')';
+ const pct=Math.max(100,Math.min(ZMAX,Math.round(vv.s/vv.base*100)));
+ zoomVal.textContent=pct+'%'; zoomRange.value=String(pct);
+}
+function vClamp(){
+ const b=vBox(), iw=vv.nw*vv.s, ih=vv.nh*vv.s;
+ vv.tx = iw<=b.w ? (b.w-iw)/2 : Math.min(0,Math.max(b.w-iw,vv.tx));
+ vv.ty = ih<=b.h ? (b.h-ih)/2 : Math.min(0,Math.max(b.h-ih,vv.ty));
+}
+function vFitScale(){const b=vBox();return Math.min(b.w/vv.nw,b.h/vv.nh);}
+function vReset(){ if(!vv.nw) return; vv.base=vFitScale(); vv.s=vv.base; const b=vBox(); vv.tx=(b.w-vv.nw*vv.s)/2; vv.ty=(b.h-vv.nh*vv.s)/2; vClamp(); vApply(); }
+function vZoom(next,px,py){
+ if(!vv.nw) return;
+ const min=vv.base, max=vv.base*(ZMAX/100);
+ next=Math.min(max,Math.max(min,next));
+ const b=vBox();
+ /* anchor every zoom (wheel, slider, +/- buttons) on the point the pointer is over, so the
+    thing you are looking at stays under the cursor. Falls back to the stage centre. */
+ const ax=(typeof px==='number')?px:(typeof vv.ax==='number'?vv.ax:b.w/2);
+ const ay=(typeof py==='number')?py:(typeof vv.ay==='number'?vv.ay:b.h/2);
+ const x=Math.max(0,Math.min(b.w,ax)), y=Math.max(0,Math.min(b.h,ay));
+ /* keep the image point under the anchor fixed while the scale changes */
+ const ix=(x-vv.tx)/vv.s, iy=(y-vv.ty)/vv.s;
+ vv.s=next; vv.tx=x-ix*next; vv.ty=y-iy*next;
+ vClamp(); vApply();
+}
+function vReady(){ if(!modalimg.naturalWidth) return; vv.nw=modalimg.naturalWidth; vv.nh=modalimg.naturalHeight; vReset(); }
+modalimg.addEventListener('load',vReady);
+if(modalimg.complete) vReady();
+let modalReturn=null;
+function openModal(src,t){
+ modalReturn=document.activeElement;
+ modaltitle.textContent=t||'Schematic';
+ modalimg.alt=(t||'Schematic')+' wiring diagram';
+ modal.classList.add('open');
+ document.body.style.overflow='hidden';
+ vv.nw=0; vv.nh=0; vv.ax=NaN; vv.ay=NaN; modalimg.style.transform=''; modalimg.src=src;
+ if(modalimg.complete) vReady();
+ try{document.getElementById('modalclose').focus();}catch(e){}
+}
+function closeModal(){if(!modal.classList.contains('open'))return;modal.classList.remove('open');modalimg.src='';document.body.style.overflow='';try{if(modalReturn&&modalReturn.focus)modalReturn.focus();}catch(e){}modalReturn=null;}
+document.getElementById('modalclose').onclick=closeModal;
+document.getElementById('zoomfit').onclick=vReset;
+document.getElementById('zoomin').onclick=()=>vZoom(vv.s*1.25);
+document.getElementById('zoomout').onclick=()=>vZoom(vv.s/1.25);
+zoomRange.addEventListener('input',()=>vZoom(vv.base*(parseInt(zoomRange.value,10)/100)));
+stage.addEventListener('wheel',e=>{
+ if(!modal.classList.contains('open')) return;
+ e.preventDefault();
+ const r=stage.getBoundingClientRect();
+ vZoom(vv.s*Math.exp(-e.deltaY*0.0013), e.clientX-r.left, e.clientY-r.top);
+},{passive:false});
+/* remember where the pointer is over the image: this is the anchor the slider and the +/-/
+   Fit buttons zoom about, so "zoom where I am hovering" holds for every control. */
+stage.addEventListener('pointermove',e=>{
+ if(!modal.classList.contains('open')) return;
+ const r=stage.getBoundingClientRect();
+ vv.ax=e.clientX-r.left; vv.ay=e.clientY-r.top;
+});
+stage.addEventListener('pointerleave',()=>{ vv.ax=NaN; vv.ay=NaN; });
+/* one pointer pans, two pointers pinch, a still tap on the backdrop closes */
+const vptrs=new Map(); let vPinch=0, vDown=null;
+stage.addEventListener('pointerdown',e=>{
+ if(!vv.nw) return;
+ vptrs.set(e.pointerId,{x:e.clientX,y:e.clientY});
+ vDown={x:e.clientX,y:e.clientY,target:e.target,moved:false};
+ try{stage.setPointerCapture(e.pointerId);}catch(x){}
+ stage.classList.add('grabbing');
+ if(vptrs.size===2){const p=[...vptrs.values()];vPinch=Math.hypot(p[0].x-p[1].x,p[0].y-p[1].y);}
+});
+stage.addEventListener('pointermove',e=>{
+ const p=vptrs.get(e.pointerId); if(!p) return;
+ if(vDown && Math.hypot(e.clientX-vDown.x,e.clientY-vDown.y)>4) vDown.moved=true;
+ const dx=e.clientX-p.x, dy=e.clientY-p.y; p.x=e.clientX; p.y=e.clientY;
+ if(vptrs.size===1){ vv.tx+=dx; vv.ty+=dy; vClamp(); vApply(); }
+ else if(vptrs.size===2){
+  const q=[...vptrs.values()]; const d=Math.hypot(q[0].x-q[1].x,q[0].y-q[1].y);
+  if(vPinch){const r=stage.getBoundingClientRect();vZoom(vv.s*(d/vPinch),(q[0].x+q[1].x)/2-r.left,(q[0].y+q[1].y)/2-r.top);}
+  vPinch=d;
+ }
+});
+function vPtrUp(e){
+ if(!vptrs.has(e.pointerId)) return;
+ vptrs.delete(e.pointerId); vPinch=0;
+ if(!vptrs.size) stage.classList.remove('grabbing');
+ if(vDown && !vDown.moved && vDown.target===stage){ vDown=null; closeModal(); return; }
+ vDown=null;
+}
+stage.addEventListener('pointerup',vPtrUp);
+stage.addEventListener('pointercancel',vPtrUp);
+stage.addEventListener('dblclick',e=>{
+ if(!vv.nw) return;
+ const r=stage.getBoundingClientRect();
+ if(Math.abs(vv.s/vv.base-1)<0.02) vZoom(1,e.clientX-r.left,e.clientY-r.top);
+ else vReset();
+});
+window.addEventListener('resize',()=>{
+ if(!modal.classList.contains('open')||!vv.nw) return;
+ if(Math.abs(vv.s/vv.base-1)<0.02) vReset();
+ else { vv.base=vFitScale(); vClamp(); vApply(); }
+});
+document.addEventListener('keydown',e=>{
+ if(!modal.classList.contains('open')) return;
+ if(e.key==='Escape'){ closeModal(); return; }
+ if(document.activeElement===zoomRange && /^Arrow/.test(e.key)) return; /* let the slider keep its own keys */
+ if(e.key==='+'||e.key==='='){ e.preventDefault(); vZoom(vv.s*1.25); }
+ else if(e.key==='-'||e.key==='_'){ e.preventDefault(); vZoom(vv.s/1.25); }
+ else if(e.key==='0'){ e.preventDefault(); vReset(); }
+ else if(e.key==='1'){ e.preventDefault(); vZoom(1); }
+ else if(/^Arrow(Left|Right|Up|Down)$/.test(e.key)){
+  e.preventDefault(); const st=e.shiftKey?140:44;
+  if(e.key==='ArrowLeft') vv.tx+=st;
+  if(e.key==='ArrowRight') vv.tx-=st;
+  if(e.key==='ArrowUp') vv.ty+=st;
+  if(e.key==='ArrowDown') vv.ty-=st;
+  vClamp(); vApply();
+ }
+});
+/* keep Tab inside the open dialog instead of letting focus wander the page behind it */
+modal.addEventListener('keydown',e=>{
+ if(e.key!=='Tab') return;
+ const f=modal.querySelectorAll('button,a[href],input,select,[tabindex]:not([tabindex="-1"])');
+ if(!f.length) return;
+ const first=f[0], last=f[f.length-1];
+ if(e.shiftKey&&document.activeElement===first){e.preventDefault();last.focus();}
+ else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus();}
+});
+function groups(){return [...new Set(FIRMWARE.map(f=>f.group))];}
+function cur(){return FIRMWARE.find(f=>f.id===bsel.value)||null;}
+function renderGroups(){
+ const keep=gsel.value;
+ gsel.innerHTML='';
+ const gp=document.createElement('option');gp.value='';gp.textContent='Select firmware…';gsel.appendChild(gp);
+ groups().forEach(g=>{const o=document.createElement('option');o.value=g;o.textContent=g;gsel.appendChild(o);});
+ if(groups().includes(keep)) gsel.value=keep;
+}
+function renderBoards(){
+ const keep=bsel.value;
+ const list=FIRMWARE.filter(f=>f.group===gsel.value);
+ bsel.innerHTML='';
+ const bp=document.createElement('option');bp.value='';bp.textContent='Select firmware .bin…';bsel.appendChild(bp);
+ list.forEach(f=>{const o=document.createElement('option');o.value=f.id;o.textContent=f.name+' ('+f.chip+')'+(f.untested?' • UNTESTED':'');o.title=f.name+' ('+f.chip+')'+(f.untested?' — untested build':'')+' — '+f.file.split('/').pop();bsel.appendChild(o);});
+ if(list.find(f=>f.id===keep)) bsel.value=keep;
+}
+async function renderDetail(){
+ const f=cur();
+ if(!f){
+  if(source==='custom'){ applyCustom(); heroSpec(); return; }
+  let chips=FIRMWARE.map(f=>'<button type="button" class="fwchip" data-fw="'+f.id+'">'+esc(f.name)+'</button>').join('');
+  detail.innerHTML='<div class="fwempty"><h3>Choose firmware to begin</h3><p>Choose a firmware and a board above — wiring, schematic and flash options will appear here.</p><div class="fwchips">'+chips+'</div><p class="hint">Have your own file? Switch to the Your .bin tab.</p></div>';
+  detail.querySelectorAll('.fwchip').forEach(b=>{ b.onclick=()=>pickFirmware(b.getAttribute('data-fw')); });
+  installer.style.pointerEvents='none'; installer.style.opacity='.5';
+  installer.title='Select a firmware first'; installer.removeAttribute('manifest');
+  dllink.removeAttribute('href'); dllink.removeAttribute('download');
+  dllink.innerHTML='<span class="dlk">↓ Download</span><span class="dlfile">Select firmware…</span>';
+  dllink.title=''; dllink.style.pointerEvents='none';
+  fofflab.textContent='MERGED IMAGE'; foffval.textContent='—'; fmanual.textContent='';
+  heroSpec();
+  try{bsel.title='';gsel.title=gsel.options[gsel.selectedIndex]?gsel.options[gsel.selectedIndex].text:'';}catch(e){}
+  return;
+ }
+  let h='<div class="dhead"><h2>'+f.name+'<span class="badge">'+f.chip+'</span></h2>'+(f.diagram?'<span class="dmeta">Schematic · click to zoom</span>':'')+'</div>'+(f.untested?'<div class="lstatus" title="Nobody has verified this on real hardware yet — flash it, test it, and report back via the helper"><i></i>Untested build</div>':'')+'<div class="desc">'+f.desc+'</div>';
+  if(f.missing){ h+='<div class="missing">'+f.missing+'</div>'; }
+  else{
+  if(f.diagram) h+='<div class="shot"><img id="thumb" src="'+f.diagram+'" alt="schematic preview" title="Click for full-screen"></div>';
+  if(fwOff(f)>0) h+='<div class="warn">App-only image — it holds no bootloader or partition table.<br>1) Flash the matching full build first at <b>0x0000</b> with Erase.<br>2) Then flash this file at <b>'+hexAddr(fwOff(f))+'</b> with <b>no</b> erase. Flashing it alone or at 0x0000 reports success but never boots.</div>';
+  if(f.guide) h+='<details><summary>Wiring guide & pin tables</summary><div class="guide" id="gd">Loading…</div></details>';
+  if(f.sha&&!f.missing) h+='<div class="phash"><span>SHA-256</span><code id="fsha" title="Click to copy full hash">'+f.sha+'</code></div>';
+  }
+ detail.innerHTML=h;
+ const sh=document.getElementById('fsha');
+ if(sh) sh.onclick=async()=>{ const full=cur()&&cur().sha?cur().sha:sh.textContent; try{ await navigator.clipboard.writeText(full); sh.title='Copied!'; }catch(e){ sh.title='Select + Ctrl+C: '+full; } setTimeout(()=>{sh.title='Click to copy full hash';},1500); };
+ const th=document.getElementById('thumb');
+ if(th) th.onclick=()=>openModal(f.diagram,f.name);
+ const dm=detail.querySelector('.dmeta');
+ if(dm){ dm.setAttribute('role','button'); dm.setAttribute('tabindex','0'); dm.setAttribute('aria-label','Open the full-screen schematic for '+esc(f.name)); dm.onclick=()=>openModal(f.diagram,f.name); dm.onkeydown=e=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); openModal(f.diagram,f.name); } }; }
+ const gd=document.getElementById('gd');
+ if(gd){ try{ const r=await fetch(f.guide); gd.innerHTML=marked.parse(await r.text()); }catch(e){ gd.innerHTML='<span class="missing">Guide missing</span>'; } }
+ if(!f.missing){ installer.style.pointerEvents=''; installer.style.opacity=''; installer.title=''; dllink.style.pointerEvents=''; dllink.setAttribute('download',''); installer.setAttribute('manifest',f.manifest); dllink.href=f.file; const fn=f.file.split('/').pop(); dllink.innerHTML='<span class="dlk">↓ Download</span>'; const sp=document.createElement('span'); sp.className='dlfile'; sp.textContent=fn; dllink.appendChild(sp); dllink.title='Download '+fn; dlSize(f.file).then(n=>{ const c=cur(); if(!c||c.file!==f.file) return; if(n){ const sz=document.createElement('span'); sz.className='dlsize'; sz.textContent=Math.round(n/1048576*10)/10+' MB'; dllink.appendChild(sz); dllink.title='Download '+fn+' · '+Math.round(n/1048576*10)/10+' MB'; } }); try{bsel.title=bsel.options[bsel.selectedIndex]?bsel.options[bsel.selectedIndex].text:'';gsel.title=gsel.options[gsel.selectedIndex]?gsel.options[gsel.selectedIndex].text:'';}catch(e){} if(source!=='custom'){ fofflab.textContent=fwOff(f)?'APP IMAGE':'MERGED IMAGE'; foffval.textContent=hexAddr(fwOff(f)); fmanual.textContent='esptool.py --port COMx -b '+flashBaudRate+' write_flash '+hexAddr(fwOff(f))+' '+fn; } }
+ if(source==='custom') applyCustom();
+ heroSpec();
+}
+gsel.onchange=()=>{try{localStorage.setItem('eff-group',gsel.value);}catch(e){}renderBoards();renderDetail();};
+bsel.onchange=()=>{try{localStorage.setItem('eff-board',bsel.value);}catch(e){}renderDetail();};
+function pickFirmware(id){
+ const f=FIRMWARE.find(x=>x.id===id); if(!f) return;
+ if(source!=='prebuilt') switchSource('prebuilt');
+ try{localStorage.setItem('eff-group',f.group);}catch(e){}
+ try{localStorage.setItem('eff-board',f.id);}catch(e){}
+ gsel.value=f.group; renderBoards(); bsel.value=f.id; renderDetail();
+}
+
+/* ===== firmware source: prebuilt library, or a .bin the user brings =====
+   Custom files are never uploaded: the File is wrapped in an object URL and
+   handed to ESP Web Tools as a generated manifest, so the bytes stream straight
+   from the browser to the chip over USB. */
+const segPre=document.getElementById('segPre'), segCus=document.getElementById('segCus');
+const preFields=document.getElementById('prebuiltFields'), cusFields=document.getElementById('customFields');
+const dropEl=document.getElementById('drop'), droptxt=document.getElementById('droptxt'), dropclear=document.getElementById('dropclear');
+const binfile=document.getElementById('binfile'), cchip=document.getElementById('cchip'), coffset=document.getElementById('coffset');
+const fofflab=document.getElementById('fofflab'), foffval=document.getElementById('foffval'), fmanual=document.getElementById('fmanual');
+const CHIP_LIST=['ESP32','ESP32-S2','ESP32-S3','ESP32-C2','ESP32-C3','ESP32-C6','ESP32-H2','ESP8266'];
+const CHIP_IDS={0x0000:'ESP32',0x0002:'ESP32-S2',0x0005:'ESP32-C3',0x0009:'ESP32-S3',0x000c:'ESP32-C2',0x000d:'ESP32-C6',0x0010:'ESP32-H2',0x0012:'ESP32-P4'};
+let source='prebuilt', customFile=null, customUrl=null, customManifestUrl=null, customDet=null;
+let customChip='ESP32-S3', customOffset=0;
+let customParts=[];
+const MAXPARTS=8;
+const PARTOFFS=['0x1000','0x8000','0x10000'];
+CHIP_LIST.forEach(c=>{const o=document.createElement('option');o.value=c;o.textContent=c;cchip.appendChild(o);});
+try{ const sc=localStorage.getItem('eff-cchip'); if(sc&&CHIP_LIST.includes(sc)) customChip=sc;
+     const so=localStorage.getItem('eff-coffset'); if(so){ const p=parseOffset(so); if(p!==null) customOffset=p; } }catch(e){}
+cchip.value=customChip; coffset.value=hexAddr(customOffset);
+function hexAddr(n){return '0x'+Math.max(0,n).toString(16).toUpperCase().padStart(4,'0');}
+function collectParts(){
+ const out=[];
+ if(customFile&&customUrl&&Number.isFinite(customOffset)&&customOffset>=0) out.push({file:customFile,url:customUrl,offset:customOffset,name:customFile.name});
+ for(const p of customParts){
+  if(!p||!p.file||!p.url||typeof p.offset!=='number'||p.offset<0) continue;
+  out.push({file:p.file,url:p.url,offset:p.offset,name:p.file.name});
+ }
+ return out;
+}
+function addPartRow(file){
+ if(!file||!/\.bin$/i.test(file.name)) return false;
+ if(customParts.length>=MAXPARTS-1) return false;
+ const url=URL.createObjectURL(file);
+ const off=PARTOFFS[customParts.length%PARTOFFS.length];
+ const row=document.createElement('div'); row.className='prow';
+ row.innerHTML='<button type="button" class="pfile"></button><input class="hexin" list="offlist" spellcheck="false" autocomplete="off" aria-label="Flash offset"><button type="button" class="px" aria-label="Remove file">×</button><input type="file" class="visin" accept=".bin,application/octet-stream">';
+ const btn=row.querySelector('.pfile'), inp=row.querySelector('input.hexin'), x=row.querySelector('.px'), fi=row.querySelector('input[type=file]');
+ const p={file:file,url:url,offset:parseOffset(off),offEl:inp};
+ inp.value=off;
+ const paint=()=>{ btn.textContent=file.name; btn.title=file.name+' · '+fmtBytes(file.size); };
+ paint();
+ btn.onclick=()=>fi.click();
+ fi.onchange=()=>{ const nf=fi.files&&fi.files[0]; if(!nf) return; if(!/\.bin$/i.test(nf.name)){ fi.value=''; return; } try{if(p.url)URL.revokeObjectURL(p.url);}catch(e){} p.file=nf; p.url=URL.createObjectURL(nf); paint(); applyCustom(); };
+ inp.onchange=()=>{ const v=parseOffset(inp.value); if(v===null||v<0){ inp.classList.add('bad'); }else{ inp.classList.remove('bad'); p.offset=v; } applyCustom(); };
+ inp.addEventListener('input',()=>inp.classList.remove('bad'));
+ x.onclick=()=>{ try{if(p.url)URL.revokeObjectURL(p.url);}catch(e){} const k=customParts.indexOf(p); if(k>=0)customParts.splice(k,1); row.remove(); applyCustom(); };
+ customParts.push(p);
+ document.getElementById('partlist').appendChild(row);
+ applyCustom();
+ return true;
+}
+function pickExtraFile(){
+ if(customParts.length>=MAXPARTS-1) return;
+ const fi=document.createElement('input');
+ fi.type='file'; fi.accept='.bin,application/octet-stream'; fi.className='visin';
+ fi.onchange=()=>{ const f=fi.files&&fi.files[0]; try{fi.remove();}catch(e){} if(f) addPartRow(f); };
+ document.body.appendChild(fi); fi.click();
+}
+const partaddBtn=document.getElementById('partadd');
+if(partaddBtn) partaddBtn.onclick=pickExtraFile;
+function parseOffset(s){ const t=String(s).trim().replace(/_/g,''); if(!t) return null;
+  const v=/^0x/i.test(t) ? parseInt(t.slice(2),16) : (/^[0-9a-f]+$/i.test(t)&&/[a-f]/i.test(t) ? parseInt(t,16) : parseInt(t,10));
+  return Number.isFinite(v)&&v>=0 ? v : null; }
+function fmtBytes(n){ return n>=1048576 ? (n/1048576).toFixed(2)+' MB' : (n/1024).toFixed(1)+' KB'; }
+/* file sizes for the download control: one HEAD per firmware, cached, and ignored on failure */
+const dlSizes=new Map();
+async function dlSize(url){
+ if(!url) return 0;
+ if(dlSizes.has(url)) return dlSizes.get(url);
+ try{ const r=await fetch(url,{method:'HEAD'}); const n=parseInt(r.headers.get('content-length')||'0',10); if(n>0){ dlSizes.set(url,n); return n; } }catch(e){}
+ return 0;
+}
+function esc(s){ return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function detectChip(buf){
+ try{
+  const b=new Uint8Array(buf); if(b.length<64) return null;
+  let at=-1; const lim=Math.min(b.length,0x2000);
+  for(let i=0;i<lim;i++){ if(b[i]===0xe9){ at=i; break; } }
+  if(at<0) return b[0]===0xea ? {chip:'ESP8266',at:0} : null;
+  const id=b[at+12]|(b[at+13]<<8);
+  return {chip:CHIP_IDS[id]||null, at:at, id:id};
+ }catch(e){ return null; }
+}
+function customManifest(parts){
+ const ps=parts||collectParts();
+ if(!ps.length) return null;
+ try{ if(customManifestUrl) URL.revokeObjectURL(customManifestUrl); }catch(e){}
+ const base=((ps[0]&&ps[0].name)||'custom.bin').replace(/\.bin$/i,'');
+ const m={name:base,version:'local',builds:[{chipFamily:customChip,parts:ps.map(p=>({path:p.url,offset:p.offset}))}]};
+ customManifestUrl=URL.createObjectURL(new Blob([JSON.stringify(m)],{type:'application/json'}));
+ return customManifestUrl;
+}
+function renderDrop(){
+ if(!customFile){
+  droptxt.innerHTML='<b>Drop your .bin</b>or browse files';
+  dropclear.hidden=true; return;
+ }
+ const chips=['<span class="dchip">'+fmtBytes(customFile.size)+'</span>'];
+ if(customDet&&customDet.chip) chips.push('<span class="dchip ok" title="Read from the image header">'+customDet.chip+(customDet.at>0?' · merged':'')+'</span>');
+ else chips.push('<span class="dchip bad" title="Set the chip family manually">chip unclear</span>');
+ droptxt.innerHTML='<span class="dfile">'+esc(customFile.name)+'</span><span class="dchips">'+chips.join('')+'</span>';
+ dropclear.hidden=false;
+}
+function renderCustomDetail(){
+ const f=customFile, need=f?Math.ceil((customOffset+f.size)/1048576):0;
+ let h='<div class="dhead"><h2>Your own .bin<span class="badge">LOCAL</span></h2><span class="dmeta">Never uploaded</span></div>';
+ h+='<div class="desc">'+(f?esc(f.name)+' · '+fmtBytes(f.size)+' · '+cchip.value:'No file chosen yet — drop a .bin in the Select panel.')+'</div>';
+ const xp=customParts.filter(p=>p&&p.file);
+ if(xp.length) h+='<ul class="plist">'+xp.map(p=>'<li><b>'+hexAddr(typeof p.offset==='number'?p.offset:0)+'</b> '+esc(p.file.name)+' · '+fmtBytes(p.file.size)+'</li>').join('')+'</ul>';
+  if(f&&customDet&&customDet.at>0&&customOffset!==0) h+='<div class="warn">This file carries data before <code>0x1000</code>, so it looks like a merged image — flash it at <b>0x0000</b> instead of '+hexAddr(customOffset)+'.</div>';
+  if(f&&customDet&&customDet.at===0&&customDet.appOnly&&customOffset===0) h+='<div class="warn">This file has no partition table, so it looks like an <b>app-only</b> build — flash it at <b>0x10000</b> over an existing full install with <b>no</b> erase, not at 0x0000.</div>';
+ if(f&&need>4) h+='<div class="warn">This offset + file size needs about <b>'+need+' MB</b> of flash, and most ESP32 boards ship with 4 MB — confirm your chip before writing.</div>';
+ h+='<table class="ptable"><thead><tr><th>Offset</th><th>Contents</th><th>Use for</th></tr></thead><tbody>'
+  +'<tr><td><code>0x0000</code></td><td>Bootloader + partition table + app</td><td>Merged image — <b>recommended</b></td></tr>'
+  +'<tr><td><code>0x1000</code></td><td>Bootloader</td><td>Bootloader-only file</td></tr>'
+  +'<tr><td><code>0x8000</code></td><td>Partition table</td><td>Changing the partition layout</td></tr>'
+  +'<tr><td><code>0x10000</code></td><td>Factory application</td><td>App-only builds</td></tr>'
+  +'<tr><td><code>0x290000</code></td><td>SPIFFS / LittleFS data</td><td>Filesystem images — confirm your own layout</td></tr></tbody></table>'
+  +'<ul class="plist"><li><b>Nothing is uploaded.</b> The file is read locally and streamed over USB.</li>'
+  +'<li>ESP Web Tools verifies the chip family before writing, so a mismatch aborts instead of bricking the board.</li>'
+  +'<li>Switching partition layouts? Use <b>Erase</b> in the install dialog first, then flash at <code>0x0000</code>.</li>'
+  +'<li>After flashing, open the <b>Terminal</b> and connect at 115200 to read the boot log.</li></ul>';
+ detail.innerHTML=h;
+ heroSpec();
+}
+function applyCustom(){
+ const parts=collectParts();
+ const addBtn=document.getElementById('partadd');
+ if(addBtn) addBtn.hidden=!(customParts.length<MAXPARTS-1);
+ if(!parts.length){
+  installer.style.pointerEvents='none'; installer.style.opacity='.5';
+  installer.title='Choose a .bin file first'; installer.removeAttribute('manifest');
+  dllink.removeAttribute('href'); dllink.removeAttribute('download');
+  dllink.innerHTML='<span class="dlk">↓ Download</span><span class="dlfile">no file selected</span>'; dllink.title=''; dllink.style.pointerEvents='none';
+  fofflab.textContent='FLASH OFFSET'; foffval.textContent=hexAddr(customOffset);
+  fmanual.textContent='waiting for a .bin file…';
+  renderCustomDetail(); renderDrop(); return;
+ }
+ const url=customManifest(parts);
+ installer.style.pointerEvents=''; installer.style.opacity=''; installer.title='';
+ if(url) installer.setAttribute('manifest',url);
+ if(parts.length===1){
+  const p=parts[0];
+  dllink.style.pointerEvents=''; dllink.href=p.url; dllink.setAttribute('download',p.name);
+  dllink.innerHTML='<span class="dlk">↓ Download</span><span class="dlfile">'+esc(p.name)+'</span><span class="dlsize">'+fmtBytes(p.file.size)+'</span>';
+  dllink.title='Save a copy of '+p.name+' ('+fmtBytes(p.file.size)+')';
+  fofflab.textContent='FLASH OFFSET'; foffval.textContent=hexAddr(p.offset);
+ }else{
+  dllink.removeAttribute('href'); dllink.removeAttribute('download');
+  dllink.innerHTML='<span class="dlk">↓ Download</span><span class="dlfile">'+esc(parts[0].name)+' +'+(parts.length-1)+' more</span>';
+  dllink.title='Multiple files can only be flashed, not downloaded as one image'; dllink.style.pointerEvents='none';
+  fofflab.textContent='FLASH OFFSET'; foffval.textContent=parts.length+' parts';
+ }
+ fmanual.textContent='esptool.py --port COMx -b '+flashBaudRate+' write_flash '+parts.map(p=>hexAddr(p.offset)+' '+p.name).join(' ');
+ renderCustomDetail(); renderDrop();
+}
+function clearCustomFlashState(){
+ installer.style.pointerEvents=''; installer.style.opacity=''; installer.title='';
+ dllink.style.pointerEvents=''; dllink.removeAttribute('download');
+}
+async function takeFile(file){
+ if(!file) return;
+ if(!/\.bin$/i.test(file.name)){ renderDrop();  droptxt.innerHTML='<b>Not a .bin file</b>pick a raw firmware image'; return; }
+ customFile=file;
+ try{ if(customUrl) URL.revokeObjectURL(customUrl); }catch(e){}
+ customUrl=URL.createObjectURL(file);
+ try{ customDet=detectChip(await file.slice(0,0x2000).arrayBuffer()); }catch(e){ customDet=null; }
+ if(customDet&&customDet.chip&&CHIP_LIST.includes(customDet.chip)){ customChip=customDet.chip; cchip.value=customChip; }
+ if(customDet&&customDet.at>0){ customOffset=0; coffset.value='0x0000'; }
+  else if(customDet&&customDet.at===0){
+   /* E9 at 0: merged (partition AA50 at 0x8000) => 0x0000, else app-only => 0x10000.
+      Defaulting app-only to 0x0000 flashes "successfully" but never boots. */
+   try{
+    let hasPart=false;
+    if(file.size>0x8002){
+     const pb=new Uint8Array(await file.slice(0x8000,0x8002).arrayBuffer());
+     hasPart=(pb.length===2&&pb[0]===0xAA&&pb[1]===0x50);
+    }
+    customDet.hasPartition=hasPart;
+    customDet.appOnly=!hasPart;
+    if(!hasPart){ customOffset=0x10000; coffset.value='0x10000'; }
+    else{ customOffset=0; coffset.value='0x0000'; }
+   }catch(e){}
+  }
+ try{localStorage.setItem('eff-cchip',customChip);}catch(e){}
+ try{localStorage.setItem('eff-coffset',coffset.value);}catch(e){}
+ applyCustom();
+}
+function switchSource(s){
+ source=s;
+ segPre.setAttribute('aria-pressed',String(s!=='custom'));
+ segCus.setAttribute('aria-pressed',String(s==='custom'));
+ preFields.hidden=(s==='custom'); cusFields.hidden=(s!=='custom');
+ if(s==='custom'){ applyCustom(); if(!customFile&&dropEl) setTimeout(()=>dropEl.focus(),60); }
+ else { clearCustomFlashState(); renderDetail(); }
+}
+segPre.onclick=()=>switchSource('prebuilt');
+segCus.onclick=()=>switchSource('custom');
+binfile.onchange=()=>{ takeFile(binfile.files&&binfile.files[0]); };
+dropEl.onclick=e=>{ if(e.target===dropclear) return; binfile.click(); };
+dropEl.onkeydown=e=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); binfile.click(); } };
+dropclear.onclick=e=>{ e.stopPropagation(); customFile=null; customDet=null; binfile.value=''; try{ if(customUrl) URL.revokeObjectURL(customUrl); }catch(x){} customUrl=null; applyCustom(); };
+['dragenter','dragover'].forEach(ev=>dropEl.addEventListener(ev,e=>{ e.preventDefault(); e.stopPropagation(); dropEl.classList.add('hot'); }));
+['dragleave','dragend'].forEach(ev=>dropEl.addEventListener(ev,()=>dropEl.classList.remove('hot')));
+dropEl.addEventListener('drop',e=>{ e.preventDefault(); e.stopPropagation(); dropEl.classList.remove('hot');
+ const f=e.dataTransfer&&e.dataTransfer.files&&e.dataTransfer.files[0]; if(f) takeFile(f); });
+window.addEventListener('dragover',e=>e.preventDefault());
+window.addEventListener('drop',e=>e.preventDefault());
+cchip.onchange=()=>{ customChip=cchip.value; try{localStorage.setItem('eff-cchip',customChip);}catch(e){} if(source==='custom') applyCustom(); };
+coffset.onchange=()=>{ const v=parseOffset(coffset.value); if(v===null){ coffset.value=hexAddr(customOffset); return; } customOffset=v; coffset.value=hexAddr(v); try{localStorage.setItem('eff-coffset',coffset.value);}catch(e){} if(source==='custom') applyCustom(); };
+try{
+ const sg=localStorage.getItem('eff-group'), sb=localStorage.getItem('eff-board');
+ renderGroups(); if(sg&&groups().includes(sg)) gsel.value=sg; renderBoards(); if(sb&&[...bsel.options].some(o=>o.value===sb)) bsel.value=sb; renderDetail();
+}catch(e){ renderGroups(); renderBoards(); renderDetail(); }
+/* terminal */
+const con=document.getElementById('console');
+const bc=document.getElementById('tconnect'), bd=document.getElementById('tdisconnect'), bx=document.getElementById('tclear');
+const tdot=document.getElementById('tdot'), tstatus=document.getElementById('tstatus'), tcopy=document.getElementById('tcopy');
+const tsave=document.getElementById('tsave'), tSEND=document.getElementById('tsend'), tEOL=document.getElementById('teol'), tSendBtn=document.getElementById('tsendbtn');
+let autoScroll=true;
+const EOL={crlf:'\r\n',lf:'\n',cr:'\r',none:''};
+con.addEventListener('scroll',()=>{autoScroll=(con.scrollHeight-con.scrollTop-con.clientHeight)<24;});
+function setSend(on){ try{[tSEND,tEOL,tSendBtn].forEach(el=>{if(el)el.disabled=!on;});}catch(e){} }
+function writeSerial(s){
+ if(!port||!port.writable) return false;
+ let w=null;
+ try{ w=port.writable.getWriter(); }catch(e){ return false; }
+ const enc=new TextEncoder();
+ w.write(enc.encode(s)).then(()=>{try{w.releaseLock();}catch(e){}}).catch(e=>{con.textContent+='\n[write error] '+e.message;try{w.releaseLock();}catch(x){}});
+ return true;
+}
+function sendLine(){
+ const v=tSEND.value; if(!v) return;
+ if(!port||!port.writable){ con.textContent+='\nNot connected — hit Connect first.'; return; }
+ writeSerial(v+(EOL[tEOL.value]!==undefined?EOL[tEOL.value]:'\r\n'));
+ con.textContent+='\n\u203a '+v;
+ tSEND.value='';
+ if(autoScroll) con.scrollTop=con.scrollHeight;
+}
+if(tSendBtn) tSendBtn.onclick=sendLine;
+if(tSEND) tSEND.addEventListener('keydown',e=>{ if(e.key==='Enter'){ e.preventDefault(); sendLine(); } });
+(function(){ const b=document.getElementById('teolinfo'), p=document.getElementById('teolpop'), ok=document.getElementById('teolok'); if(!b||!p) return;
+ function hide(){ p.hidden=true; b.setAttribute('aria-expanded','false'); }
+ b.onclick=e=>{ e.stopPropagation(); const s=p.hidden; p.hidden=!s; b.setAttribute('aria-expanded',String(s)); if(s&&ok){ try{ok.focus();}catch(x){} } };
+ if(ok) ok.onclick=()=>{ hide(); };
+ document.addEventListener('click',e=>{ if(!p.hidden&&!e.target.closest('.sendrow')) hide(); });
+ document.addEventListener('keydown',e=>{ if(e.key==='Escape'&&!p.hidden) hide(); });
+})();
+if(tsave) tsave.onclick=()=>{
+ try{
+  const stamp=new Date().toISOString().slice(0,19).replace(/[:T]/g,'-');
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([con.textContent],{type:'text/plain'}));
+  a.download='esp-serial-log-'+stamp+'.txt';
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(()=>URL.revokeObjectURL(a.href),5000);
+  tsave.classList.add('ok'); setTimeout(()=>tsave.classList.remove('ok'),1200);
+ }catch(e){}
+};
+/* theme */
+const themebtn=document.getElementById('themebtn');
+function setTheme(t){const light=(t==='light');if(light)document.documentElement.setAttribute('data-theme','light');else document.documentElement.removeAttribute('data-theme');try{localStorage.setItem('eff-theme',t);}catch(e){}if(themebtn)themebtn.textContent=light?'DARK':'LIGHT';try{document.querySelector('meta[name="theme-color"]').setAttribute('content',light?'#e3e1da':'#191919');}catch(e){}}
+try{setTheme(localStorage.getItem('eff-theme')||'dark');}catch(e){setTheme('dark');}
+if(themebtn)themebtn.onclick=()=>{setTheme(document.documentElement.getAttribute('data-theme')==='light'?'dark':'light');};
+try{ const ng=new Set(FIRMWARE.map(f=>f.group)).size; document.getElementById('boardcount').textContent=FIRMWARE.length+(FIRMWARE.length===1?' firmware':' firmwares')+' · '+ng+(ng===1?' group':' groups'); }catch(e){}
+/* ===== band content ========================================================
+   The introduction band mirrors whatever is currently loaded, the library band
+   lists every entry in boards.js as a card, and the command line block mirrors
+   the same esptool command the Select panel shows. All three read the same data
+   as the dropdowns, so adding a .bin to boards.js updates the whole page. */
+const libgrid=document.getElementById('libgrid');
+const himg=document.getElementById('himg'), hname=document.getElementById('hname'), hdots=document.getElementById('hdots'), hpanel=document.getElementById('hR');
+/* The introduction panel is an auto-advancing preview of the library: one board
+   at a time with dots and arrows. Picking a slide selects that board in the
+   flasher, and the table underneath always reports what is really loaded - so the
+   carousel can browse freely without ever lying about the current selection.
+   State uses var + a ready flag on purpose: this block runs after the app's first
+   render, and heroSpec() is called from that render, so nothing here may be in the
+   temporal dead zone when it arrives. */
+var hslides=null, hIdx=0, hTimer=null, hHold=false, hReady=false;
+function hPaint(i){
+ if(!hReady||!hslides.length) return;
+ hIdx=(i%hslides.length+hslides.length)%hslides.length;
+ const f=hslides[hIdx];
+ if(himg){ himg.src=f.diagram; himg.alt=f.name+' wiring diagram'; himg.title='Flash this board — '+f.name; }
+ if(hname) hname.textContent=f.name;
+ const g=document.getElementById('hgroup'); if(g) g.textContent=f.group;
+ if(hdots){ Array.prototype.forEach.call(hdots.children,(d,n)=>{ d.setAttribute('aria-current', n===hIdx?'true':'false'); }); }
+ /* keep the spec table in sync with the slide so the info always matches the image */
+ const spec=document.getElementById('hspec');
+ if(spec){ const fn=f.file.split('/').pop();
+  spec.innerHTML='<div><span>Board</span><b title="'+esc(f.name)+'">'+esc(f.name)+'</b></div>'
+   +'<div><span>Chip</span><b>'+esc(f.chip)+'</b></div>'
+    +'<div><span>Flash at</span><b>'+(f.missing?'—':hexAddr(fwOff(f)))+'</b></div>'
+    +'<div><span>Image</span><b title="'+esc(fn)+'">'+esc(fn)+'</b></div>'; }
+}
+function hSync(id){
+ if(!hReady) return;
+ const i=hslides.findIndex(x=>x.id===id);
+ if(i>=0) hPaint(i);
+}
+function hPlay(){
+ if(hTimer||!hReady||hslides.length<2) return;
+ try{ if(window.matchMedia('(prefers-reduced-motion: reduce)').matches) return; }catch(e){}
+ hTimer=setInterval(()=>{ if(!hHold&&!document.hidden&&!document.querySelector('.modal.open')) hPaint(hIdx+1); },5200);
+}
+function heroSpec(){
+ const spec=document.getElementById('hspec');
+ const cmd=document.getElementById('clicmd'), fm=document.getElementById('fmanual');
+ if(cmd) cmd.textContent=(source!=='custom'&&fm&&fm.textContent)?fm.textContent:'esptool.py --port COMx -b 115200 write_flash 0x00000 firmware.bin';
+ if(!spec) return;
+ const f=(source==='custom')?null:cur();
+ if(!f){
+  spec.innerHTML='<div><span>Source</span><b>'+(source==='custom'?'Your own .bin':'—')+'</b></div>'
+   +'<div><span>Flash at</span><b>'+(source==='custom'?hexAddr(customOffset):'—')+'</b></div>';
+  return;
+ }
+ const fn=f.file.split('/').pop();
+ spec.innerHTML='<div><span>Board</span><b title="'+esc(f.name)+'">'+esc(f.name)+'</b></div>'
+  +'<div><span>Chip</span><b>'+esc(f.chip)+'</b></div>'
+   +'<div><span>Flash at</span><b>'+(f.missing?'—':hexAddr(fwOff(f)))+'</b></div>'
+   +'<div><span>Image</span><b title="'+esc(fn)+'">'+esc(fn)+'</b></div>';
+ hSync(f.id);
+}
+function hBuild(){
+ hslides=FIRMWARE.filter(f=>f.diagram&&!f.missing);
+ if(!hslides.length){ const t=document.getElementById('hthumb'); if(t) t.className='hthumb empty'; return; }
+ hReady=true;
+ if(hdots){
+  hdots.innerHTML=hslides.map(f=>'<button type="button" aria-label="Preview '+esc(f.name)+'"></button>').join('');
+  Array.prototype.forEach.call(hdots.children,(d,i)=>{ d.onclick=()=>hPaint(i); });
+ }
+ if(himg) himg.onclick=()=>{ const f=hslides[hIdx]; if(!f) return; pickFirmware(f.id); const w=document.getElementById('flash'); if(w) w.scrollIntoView({behavior:'smooth',block:'start'}); };
+ const prev=document.getElementById('hprev'), next=document.getElementById('hnext');
+ if(prev) prev.onclick=()=>hPaint(hIdx-1);
+ if(next) next.onclick=()=>hPaint(hIdx+1);
+ if(hpanel){
+  hpanel.addEventListener('pointerenter',()=>{hHold=true;});
+  hpanel.addEventListener('pointerleave',()=>{hHold=false;});
+  hpanel.addEventListener('focusin',()=>{hHold=true;});
+  hpanel.addEventListener('focusout',()=>{hHold=false;});
+ }
+ hPaint(0); hPlay();
+}
+hBuild();
+function fwOff(f){ return (f&&typeof f.offset==='number'&&f.offset>0)?f.offset:0; }
+function renderLibrary(){
+ if(!libgrid) return;
+ libgrid.innerHTML=FIRMWARE.map(f=>{
+   return '<article class="lcard"><div class="lmeta"><span class="lgroup">'+esc(f.group)+'</span><span class="badge">'+esc(f.chip)+'</span>'+(fwOff(f)?'<span class="badge" title="App-only image, flashed at this offset"> '+hexAddr(fwOff(f))+'</span>':'')+'</div>'
+   +'<h3>'+esc(f.name)+'</h3>'+(f.untested?'<div class="lstatus" title="Nobody has verified this on real hardware yet — flash it, test it, and report back via the helper"><i></i>Untested build</div>':'')+'<p>'+esc(f.desc)+'</p>'
+   +'<div class="lgo"><button type="button" class="line" data-fw="'+f.id+'">'+(f.missing?'Bin not bundled':'Flash this board')+'</button></div></article>';
+ }).join('');
+ libgrid.querySelectorAll('button[data-fw]').forEach(b=>{
+  const id=b.getAttribute('data-fw'), f=FIRMWARE.find(x=>x.id===id);
+  if(f&&f.missing){ b.disabled=true; b.title='Drop '+f.file.split('/').pop()+' into firmware/ to enable this board'; return; }
+  b.onclick=()=>{ pickFirmware(id); const w=document.getElementById('workstation'); if(w) w.scrollIntoView({behavior:'smooth',block:'start'}); };
+ });
+ const lc=document.getElementById('libcount');
+ if(lc) lc.textContent=FIRMWARE.length+' images · '+groups().length+' groups · merged full-flash images written at 0x0000.';
+}
+const ccopy=document.getElementById('cmdcopy');
+if(ccopy) ccopy.onclick=async()=>{ const c=document.getElementById('clicmd'); if(!c) return; try{ await navigator.clipboard.writeText(c.textContent); ccopy.textContent='Copied'; }catch(e){ ccopy.textContent='Select + Ctrl+C'; } setTimeout(()=>{ccopy.textContent='Copy command';},1500); };
+renderLibrary();
+heroSpec();
+function setT(on,msg){try{if(tdot)tdot.classList.toggle('on',!!on);if(tstatus&&msg)tstatus.textContent=msg;}catch(e){}}
+if(tcopy)tcopy.onclick=async()=>{try{await navigator.clipboard.writeText(con.textContent);tcopy.classList.add('ok');setTimeout(()=>tcopy.classList.remove('ok'),1200);}catch(e){const o=tcopy.title;tcopy.title='Select text + Ctrl+C';setTimeout(()=>tcopy.title=o,1500);}};
+let port=null, reader=null, keep=false;
+bx.onclick=()=>{con.textContent='';};
+bd.onclick=async()=>{keep=false;try{await reader?.cancel();}catch(e){}try{await port?.close();}catch(e){}port=null;bc.disabled=false;bd.disabled=true;setSend(false);setT(false,'Idle — connect at 115200 to watch boot logs after flashing.');con.textContent+='\n— disconnected —';};
+bc.onclick=async()=>{
+ if(!('serial' in navigator)){let m='Web Serial not supported — use Chrome or Edge on desktop.';try{const ua=navigator.userAgent||'';const ios=/iPhone|iPad|iPod/i.test(ua)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);const andr=/Android/i.test(ua);if(ios)m='iPhone and iPad cannot flash over USB — Apple blocks serial access in every browser. Use a computer, or update over Wi-Fi if your build supports OTA.';else if(andr){const v=parseInt((ua.match(/Chrome\/(\d+)/)||[])[1]||'0',10);m=(v&&v<148)?'This Chrome is too old for USB flashing — update Chrome to v148 or newer, connect the board with a USB-OTG adapter, then try again.':'Connect the board with a USB-OTG adapter and tap Connect. If no port appears, update Chrome and use a data-capable cable.';}}catch(e){}con.textContent+='\n'+m;return;}
+ if(port){con.textContent+='\nTerminal already connected — Disconnect first.';return;}
+ bc.disabled=true;
+ try{
+  const picked=await navigator.serial.requestPort();
+  // If a previous session left it open (e.g. flasher dialog still holding it), close first.
+  try{ if(picked.readable||picked.writable) await picked.close(); }catch(e){}
+  port=picked;
+  await port.open({baudRate:parseInt(document.getElementById('tbaud').value,10)});
+  bd.disabled=false;setSend(true);con.textContent+='\n— connected, listening… —';setT(true,'Connected — streaming serial output…');
+  keep=true;const dec=new TextDecoder();
+  while(port.readable&&keep){
+   reader=port.readable.getReader();
+   try{for(;;){const{value,done}=await reader.read();if(done)break;if(value){con.textContent+=dec.decode(value,{stream:true});if(autoScroll)con.scrollTop=con.scrollHeight;}}}catch(e){if(keep)con.textContent+='\n[read error] '+e.message;}
+   finally{reader.releaseLock();}
+  }
+ }catch(e){
+  if(e.name==='InvalidStateError'||/already open/i.test(e.message||'')){
+   con.textContent+='\nPort is busy — close the FLASH dialog, Disconnect here, unplug/replug USB, then Connect again. (One app holds a port at a time.)';
+  } else if(e.name==='NotFoundError'){ con.textContent+='\nNo port picked.'; }
+  else{con.textContent+='\n[terminal] '+e.message;}
+  bc.disabled=false;bd.disabled=true;port=null;setSend(false);setT(false);
+ }
+};
+/* ===== ESP Web Tools dialog theming (presentation only; flashing logic untouched) =====
+   The install/erase/progress/complete dialogs are rendered by the esp-web-tools
+   library inside encapsulated shadow roots. This block themes them through
+   inherited Material tokens + injected stylesheets. No flashing behavior,
+   state machine, event handler, or library text is modified. */
+const EWT_CSS = `
+:host{color-scheme:dark;font-family:'Inter','Manrope','DM Sans',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif;--md-sys-color-primary:#8fb8d8;--md-sys-color-on-primary:#101418;--md-sys-color-surface:#171717;--md-sys-color-surface-container:#1d1d1d;--md-sys-color-surface-container-high:#232323;--md-sys-color-surface-container-highest:#2a2a2a;--md-sys-color-secondary-container:#2c2c2c;--md-sys-color-on-surface:#F3F3F3;--md-sys-color-on-surface-variant:#969696;--md-sys-color-error:#f2b8b5;--md-sys-color-on-error-container:#f2b8b5;--md-sys-color-shadow:#000000;--md-sys-color-tertiary:#8fb8d8;--md-ref-typeface-plain:'Inter','Manrope','DM Sans',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif;--md-ref-typeface-brand:'Departure Mono',monospace;--md-sys-typescale-headline-small-font:'Departure Mono',monospace;--md-sys-typescale-title-large-font:'Departure Mono',monospace;--md-sys-typescale-body-large-font:'Inter','Manrope','DM Sans',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif;--md-sys-typescale-body-medium-font:'Inter','Manrope','DM Sans',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif;--md-sys-typescale-label-large-font:'Inter','Manrope','DM Sans',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif;--md-text-button-label-text-font:'Departure Mono',monospace;--md-text-button-label-text-size:.78rem;--md-text-button-label-text-weight:400;--md-text-button-label-text-color:#c9d8e8;--md-checkbox-selected-container-color:#8fb8d8;--md-checkbox-selected-icon-color:#101418;--md-checkbox-outline-color:#8a8a8a;--md-circular-progress-active-indicator-color:#8fb8d8;--md-circular-progress-size:64px;--md-icon-button-icon-color:#969696;--md-icon-button-hover-state-layer-color:rgba(255,255,255,.08);--md-dialog-container-color:#232323;--md-filled-field-container-color:#242424;--md-filled-select-text-field-container-color:#242424;--text-color:#969696}
+:host-context(html[data-theme="light"]){color-scheme:light;--md-sys-color-primary:#0369a1;--md-sys-color-on-primary:#ffffff;--md-sys-color-surface:#E8E7E2;--md-sys-color-surface-container:#EDECE9;--md-sys-color-surface-container-high:#F0EFEB;--md-sys-color-surface-container-highest:#F5F4F0;--md-sys-color-secondary-container:#E2E0D9;--md-sys-color-on-surface:#252525;--md-sys-color-on-surface-variant:#5f6368;--md-sys-color-error:#ba1a1a;--md-sys-color-on-error-container:#410002;--md-sys-color-tertiary:#0369a1;--md-text-button-label-text-color:#4a5a6a;--md-checkbox-selected-icon-color:#ffffff;--md-checkbox-outline-color:#6f757e;--md-icon-button-icon-color:#5f6368;--md-icon-button-hover-state-layer-color:rgba(0,0,0,.06);--md-dialog-container-color:#F0EFEB;--md-filled-field-container-color:#F5F4F0;--md-filled-select-text-field-container-color:#F5F4F0;--text-color:#5f6368}
+dialog{border-radius:20px!important}
+dialog::backdrop{background:rgba(0,0,0,.6)!important;backdrop-filter:blur(3px)}
+:host-context(html[data-theme="light"]) dialog::backdrop{background:rgba(40,38,34,.5)!important;backdrop-filter:blur(3px)}
+.headline{font-family:'Departure Mono',monospace!important;font-size:1.2rem!important;letter-spacing:.05em!important;text-transform:uppercase!important}
+slot[name="headline"]::slotted(*){font-family:'Departure Mono',monospace!important;letter-spacing:.05em!important;text-transform:uppercase!important}
+div[slot="headline"]{font-family:'Departure Mono',monospace;overflow-wrap:anywhere}
+div[slot="content"]{overflow-wrap:anywhere}
+div[slot="actions"]>ew-text-button:last-child{--md-text-button-label-text-color:var(--md-sys-color-primary)!important;--md-text-button-label-text-weight:700!important}
+label.formfield{display:inline-flex!important;align-items:center!important;gap:10px!important;margin-top:14px!important;font-size:.85rem!important}
+ew-list-item{overflow-wrap:anywhere}
+ewt-console{background:#0D0D0D!important;border-radius:12px!important;display:block!important}
+.log{background:#0D0D0D!important;color:#4ade80!important;font-family:'JetBrains Mono',ui-monospace,Menlo,Consolas,monospace!important;font-size:12px!important;line-height:1.55!important;padding:14px!important;border-radius:12px!important}
+.log input{background:#161616!important;color:#e8e8e8!important;border:1px solid #2c2c2c!important;border-radius:8px!important;font-family:inherit!important}
+.track{stroke:rgba(128,128,128,.25)!important}
+md-menu{--md-menu-container-color:#232323}
+ew-list-item{--md-list-item-label-text-color:#F3F3F3;--md-list-item-supporting-text-color:#969696;--md-list-item-leading-icon-color:#c9c9c9;--md-list-item-trailing-icon-color:#969696;--md-list-item-hover-state-layer-color:rgba(255,255,255,.06);--md-list-item-hover-state-layer-opacity:1}
+:host-context(html[data-theme="light"]) md-menu{--md-menu-container-color:#F0EFEB}
+:host-context(html[data-theme="light"]) ew-list-item{--md-list-item-label-text-color:#252525;--md-list-item-supporting-text-color:#5f6368;--md-list-item-leading-icon-color:#4a5a6a;--md-list-item-trailing-icon-color:#5f6368;--md-list-item-hover-state-layer-color:rgba(0,0,0,.05)}
+`;
+const EWT_OK_SVG = '<svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#4ade80" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>';
+function ewtHasParty(t){
+  for(let k=0;k<t.length-1;k++){ if(t.charCodeAt(k)===0xD83C && t.charCodeAt(k+1)===0xDF89) return true; }
+  return false;
+}
+function ewtSwapParty(root){
+  let w;
+  try{ w = document.createTreeWalker(root, NodeFilter.SHOW_TEXT); }catch(e){ return; }
+  const hits = [];
+  let n = null;
+  try{ while((n = w.nextNode())){ if(n.nodeValue && ewtHasParty(n.nodeValue)) hits.push(n); } }catch(e){ return; }
+  for(const t of hits){
+    try{
+      const s = document.createElement('span');
+      s.setAttribute('data-ewt-success','1');
+      s.style.cssText = 'display:inline-flex;align-items:center;justify-content:center;width:56px;height:56px;border-radius:50%;background:rgba(74,222,128,.12);border:1px solid rgba(74,222,128,.45);vertical-align:middle';
+      s.innerHTML = EWT_OK_SVG;
+      if(t.parentNode) t.parentNode.replaceChild(s, t);
+    }catch(e){}
+  }
+}
+/* ===== flashing progress: pixel bar + rotating tip, drawn into the ESP Web Tools dialog =====
+   The dialog builds a Material circular spinner inside its shadow tree. We never touch the
+   flashing state machine: we only insert our own bar next to that spinner, hide the spinner
+   once the bar is really in the DOM, and mirror its value/indeterminate state every 160ms. */
+const EWT_PIX_CSS = `
+.ewt-pix{display:block;margin:15px 0 4px;text-align:left}
+.ewt-pix .hd{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin-bottom:9px;font-family:'Departure Mono',ui-monospace,monospace;font-size:11px;letter-spacing:.15em;text-transform:uppercase;color:#969696}
+.ewt-pix .hd .pc{font-family:'JetBrains Mono',ui-monospace,Menlo,monospace;font-size:16px;letter-spacing:.01em;font-variant-numeric:tabular-nums;color:#F3F3F3}
+.ewt-pix .seg{display:flex;gap:2px;height:18px;align-items:stretch}
+.ewt-pix .seg i{flex:1 1 0;min-width:2px;border-radius:2px;background:rgba(128,128,128,.16);box-shadow:inset 0 0 0 1px rgba(128,128,128,.14);transition:background .16s,box-shadow .16s}
+.ewt-pix .seg i.on{background-color:#00c2e0;background-image:repeating-linear-gradient(115deg,rgba(255,255,255,.32) 0 2px,transparent 2px 5px);box-shadow:inset 0 0 0 1px rgba(0,229,255,.35)}
+.ewt-pix[busy] .seg i{animation:ewtMarch 1.4s ease-in-out infinite}
+@keyframes ewtMarch{0%,100%{opacity:.18}45%{opacity:1}}
+.ewt-tip{display:block;margin:12px 0 0;min-height:2.6em;font-family:'JetBrains Mono',ui-monospace,Menlo,Consolas,monospace;font-size:12px;line-height:1.5;color:#969696}
+.ewt-tip b{color:#F3F3F3;font-weight:600}
+.ewt-dots{display:flex;gap:5px;margin-top:10px}
+.ewt-dots span{width:18px;height:2px;border-radius:2px;background:rgba(128,128,128,.28);transition:background .25s}
+.ewt-dots span.on{background:#00c2e0}
+:host-context(html[data-theme="light"]) .ewt-pix .seg i{background:rgba(60,70,85,.11);box-shadow:inset 0 0 0 1px rgba(60,70,85,.1)}
+:host-context(html[data-theme="light"]) .ewt-pix .seg i.on{background-color:#0e8fc0;box-shadow:inset 0 0 0 1px rgba(3,105,161,.35)}
+:host-context(html[data-theme="light"]) .ewt-pix .hd .pc{color:#252525}
+:host-context(html[data-theme="light"]) .ewt-tip{color:#5f6368}
+:host-context(html[data-theme="light"]) .ewt-tip b{color:#252525}
+:host-context(html[data-theme="light"]) .ewt-dots span.on{background:#0369a1}
+@media(prefers-reduced-motion:reduce){.ewt-pix[busy] .seg i{animation:none}}
+`;
+const EWT_TIPS=[
+ 'Hold <b>BOOT</b>, tap <b>RST</b>, release <b>BOOT</b> — that is the way into download mode.',
+ 'Merged images are written to <b>0x0000</b> — app-only images go to the offset shown in the Flash panel.',
+ 'Keep this tab in front: browsers throttle the transfer in background tabs.',
+ 'Nothing is uploaded — the .bin streams from your machine straight down the USB cable.',
+ 'Only one app can hold the port. Close the Terminal before you flash.',
+ 'Done flashing? Open <b>Terminal</b> at <b>115200</b>, tap RST, and read the boot log.',
+ 'Blank screen or boot loop usually means wiring. The schematic is one click away.',
+];
+function ewtFindProgress(node){
+ const seen=new Set(), stack=[node];
+ while(stack.length){
+  const el=stack.pop();
+  if(!el||el.nodeType!==1||seen.has(el)) continue;
+  seen.add(el);
+  if(el.tagName==='MD-CIRCULAR-PROGRESS') return el;
+  let r=null; try{ r=el.shadowRoot; }catch(e){}
+  if(r) for(const k of r.children) stack.push(k);
+  for(const k of el.children) stack.push(k);
+ }
+ return null;
+}
+function ewtPixInstall(dlg,prog){
+ const host=prog.parentNode; if(!host) return;
+ let root=null; try{ root=prog.getRootNode(); }catch(e){}
+ const scope=(root&&root.nodeType===11)?root:(dlg.shadowRoot||document);
+ const N=32;
+ const box=document.createElement('div'); box.className='ewt-pix';
+ const hd=document.createElement('div'); hd.className='hd';
+ const lab=document.createElement('span'); lab.className='lb'; lab.textContent='Flashing';
+ const pc=document.createElement('span'); pc.className='pc'; pc.textContent='0%';
+ hd.appendChild(lab); hd.appendChild(pc);
+ const seg=document.createElement('div'); seg.className='seg';
+ for(let i=0;i<N;i++){ const s=document.createElement('i'); s.style.animationDelay=(i*0.038).toFixed(3)+'s'; seg.appendChild(s); }
+ const tip=document.createElement('div'); tip.className='ewt-tip'; tip.innerHTML=EWT_TIPS[0];
+ const dots=document.createElement('div'); dots.className='ewt-dots';
+ for(let i=0;i<EWT_TIPS.length;i++){ const d=document.createElement('span'); if(i===0) d.className='on'; dots.appendChild(d); }
+ box.appendChild(hd); box.appendChild(seg); box.appendChild(tip); box.appendChild(dots);
+ host.insertBefore(box,prog.nextSibling);
+ /* the bar is in the DOM - only now hide the spinner */
+ try{ prog.style.display='none'; }catch(e){}
+ try{ const st=document.createElement('style'); st.setAttribute('data-ewt-pix','1'); st.textContent=EWT_PIX_CSS; scope.appendChild(st); }catch(e){}
+ let ti=0;
+ const tipTimer=setInterval(()=>{
+  if(!dlg.isConnected){ clearInterval(tipTimer); return; }
+  ti=(ti+1)%EWT_TIPS.length; tip.innerHTML=EWT_TIPS[ti];
+  for(let i=0;i<dots.children.length;i++) dots.children[i].className = (i===ti?'on':'');
+ },4200);
+ /* the dialog prints its own stage word (Installing / Erasing / Writing); reuse it as the
+    bar's label rather than inventing a second vocabulary. Our own nodes are skipped. */
+ const stage=()=>{
+  try{
+   const seen=new Set(), stack=[dlg];
+   while(stack.length){
+    const el=stack.pop();
+    if(!el||el.nodeType!==1||seen.has(el)||box.contains(el)) continue;
+    seen.add(el);
+    const t=(el.textContent||'').trim();
+    if(t&&t.length<24&&/^(installing|erasing|writing|preparing|connecting|verifying|finished|erase|done)/i.test(t)) return t.toUpperCase();
+    let r=null; try{ r=el.shadowRoot; }catch(e){}
+    if(r) for(const k of r.children) stack.push(k);
+    for(const k of el.children) stack.push(k);
+   }
+  }catch(e){}
+  return null;
+ };
+ let tick=0;
+ const paint=()=>{
+  if(!prog.isConnected){ /* finished: light every segment and stop */
+   box.removeAttribute('busy');
+   for(let i=0;i<N;i++) seg.children[i].className='on';
+   pc.textContent='100%'; lab.textContent='Done';
+   clearInterval(poll); return;
+  }
+  let v=NaN;
+  try{ if(typeof prog.value==='number') v=prog.value; }catch(e){}
+  if(!isFinite(v)){ const raw=prog.getAttribute('value'); if(raw!==null&&raw!=='') v=parseFloat(raw); }
+  let ind=false;
+  try{ ind = typeof prog.indeterminate==='boolean' ? prog.indeterminate : prog.hasAttribute('indeterminate'); }catch(e){}
+  if(ind||!isFinite(v)){
+   box.setAttribute('busy','');
+   for(let i=0;i<N;i++) seg.children[i].className='';
+   pc.textContent='--';
+  } else {
+   box.removeAttribute('busy');
+   const on=Math.round(Math.max(0,Math.min(1,v))*N);
+   for(let i=0;i<N;i++) seg.children[i].className = i<on ? 'on' : '';
+   pc.textContent=Math.round(v*100)+'%';
+  }
+  if(tick++%6===0){ const s=stage(); if(s) lab.textContent=s.charAt(0)+s.slice(1).toLowerCase(); }
+ };
+ const poll=setInterval(()=>{ if(!dlg.isConnected) clearInterval(poll); else paint(); },160);
+ paint();
+}
+/* recursively search the entire DOM — including every shadow root — for ESP Web Tools dialogs
+   (install overview + progress, and the Logs & Console dialog) */
+function ewtFindDialogs(root){
+  const found=[];
+  try{
+    const stack=[root];
+    const seen=new Set();
+    while(stack.length){
+      const n=stack.pop();
+      if(!n||seen.has(n)) continue;
+      seen.add(n);
+      if(n.nodeType===1){
+        try{ if(/^(EWT-.*DIALOG|MD-DIALOG|MD-MENU)$/.test(n.tagName||'')) found.push(n); }catch(e){}
+        let sr=null; try{sr=n.shadowRoot;}catch(e){}
+        if(sr){stack.push(sr);seen.add(sr);}
+        for(const k of n.children) stack.push(k);
+      } else if(n.nodeType===11){
+        for(const k of n.children) stack.push(k);
+      }
+    }
+  }catch(e){}
+  return found;
+}
+/* one shared observer, attached to every shadow root we discover, so dialogs created
+   later *inside* an already-connected shadow tree still trigger a re-theme */
+let ewtObs=null;
+const ewtWatchedRoots=new Set();
+function ewtWatchRoot(root){
+  if(!root||!ewtObs||ewtWatchedRoots.has(root)) return;
+  ewtWatchedRoots.add(root);
+  try{ ewtObs.observe(root,{childList:true,subtree:true}); }catch(e){}
+}
+function ewtStyleRoot(root){
+  if(!root||root.__ewtThemed) return false;
+  root.__ewtThemed = true;
+  try{
+    const st = document.createElement('style');
+    st.setAttribute('data-ewt-theme','1');
+    st.textContent = EWT_CSS;
+    root.appendChild(st);
+    try{ window.__ewtRoots=(window.__ewtRoots||0)+1; }catch(e){}
+  }catch(e){ return false; }
+  return true;
+}
+function ewtThemeAll(){
+  /* pass 1: theme EVERY ESP Web Tools host on the page (install button, dialogs,
+     console). The overview menu lives in the install-button's own shadow root,
+     not in a dialog element, so dialog-only theming could never reach it. */
+  try{
+    const stack=[document], seen=new Set();
+    while(stack.length){
+      const n=stack.pop();
+      if(!n||seen.has(n)) continue;
+      seen.add(n);
+      if(n.nodeType===1){
+        let t=''; try{ t=n.tagName||''; }catch(e){}
+        if(t==='ESP-WEB-INSTALL-BUTTON'||t.indexOf('EWT-')===0||t==='MD-DIALOG'||t==='MD-MENU'){
+          let hsr=null; try{ hsr=n.shadowRoot; }catch(e){}
+          if(hsr){ ewtStyleRoot(hsr); ewtWatchRoot(hsr); }
+        }
+        let sr2=null; try{ sr2=n.shadowRoot; }catch(e){}
+        if(sr2) stack.push(sr2);
+        try{ for(const k of n.children) stack.push(k); }catch(e){}
+      } else if(n.nodeType===11){
+        try{ for(const k of n.children) stack.push(k); }catch(e){}
+      }
+    }
+  }catch(e){}
+  /* pass 2: dialog-specific extras (pixel progress bar, success icon) */
+  let dlgs = [];
+  try{ dlgs = ewtFindDialogs(document); }catch(e){ return; }
+  for(const dlg of dlgs){
+    if(!dlg.__ewtPix){ const pr=ewtFindProgress(dlg); if(pr){ dlg.__ewtPix=true; try{ ewtPixInstall(dlg,pr); }catch(e){} } }
+    const seen = new Set();
+    const stack = [dlg];
+    while(stack.length){
+      const el = stack.pop();
+      if(!el || el.nodeType !== 1 || seen.has(el)) continue;
+      seen.add(el);
+      let root = null;
+      try{ root = el.shadowRoot; }catch(e){}
+      if(root){
+        ewtWatchRoot(root);
+        ewtStyleRoot(root);
+        try{ ewtSwapParty(root); }catch(e){}
+        let kids = null;
+        try{ kids = root.children; }catch(e){}
+        if(kids) for(const k of kids) stack.push(k);
+      }
+      let mine = null;
+      try{ mine = el.children; }catch(e){}
+      if(mine) for(const k of mine) stack.push(k);
+    }
+  }
+}
+try{
+  ewtObs = new MutationObserver(()=>{ ewtThemeAll(); });
+  ewtThemeAll();
+  /* watch the entire document tree for changes — not just body children,
+     because the dialog may live inside a custom element's shadow root */
+  try{
+    ewtObs.observe(document.documentElement, {childList:true, subtree:true});
+  }catch(e){}
+  /* steady safety net: re-scan every 2.5s forever. Each scan is one cheap DOM walk
+     that writes nothing when no dialog exists, so a FLASH click at any time —
+     even minutes after load — still gets a themed dialog. */
+  setInterval(()=>{ try{ ewtThemeAll(); }catch(e){} },2500);
+  /* also re-check whenever the user interacts with the page — plus a few delayed
+     passes, because the dialog opens *after* the click that spawns it */
+  document.addEventListener('click',()=>{ ewtThemeAll(); [300,900,1800].forEach(ms=>setTimeout(()=>{ try{ewtThemeAll();}catch(e){} },ms)); },true);
+  window.addEventListener('load',()=>{ ewtThemeAll(); });
+}catch(e){}
+/* ===== helper bot: offline rule-based answers, no network, no keys ===== */
+(function(){
+ const fab=document.getElementById('botfab'), panel=document.getElementById('botpanel');
+ const log=document.getElementById('botlog'), chips=document.getElementById('botchips');
+ const input=document.getElementById('botinput'), send=document.getElementById('botsend');
+ const closeBtn=document.getElementById('botclose'), issueBtn=document.getElementById('botissue');
+ const infoBtn=document.getElementById('botinfo');
+ if(!fab||!panel||!log) return;
+ /* issues open on the flasher repo — REPO_SLUG comes from the top of this script */
+ let lastQ='';
+ function boardName(){
+  let board='';
+  try{
+   const g=document.getElementById('group'), b=document.getElementById('board');
+   const gt=g&&g.options[g.selectedIndex]?g.options[g.selectedIndex].text:'';
+   const bt=b&&b.options[b.selectedIndex]?b.options[b.selectedIndex].text:'';
+   if(gt||bt) board=gt+(bt?' / '+bt:'');
+  }catch(e){}
+  return board;
+ }
+ function issueShow(){
+  const pop=document.getElementById('botissue-pop'); if(!pop) return;
+  const ti=document.getElementById('issuetitle');
+  if(ti&&!ti.value&&lastQ) ti.value=lastQ.slice(0,120);
+  infoHide(); pop.hidden=false;
+  if(issueBtn) issueBtn.setAttribute('aria-expanded','true');
+  try{ ((ti&&ti.value)?document.getElementById('issuebody'):ti).focus(); }catch(e){}
+ }
+ function issueHide(){ const pop=document.getElementById('botissue-pop'); if(pop) pop.hidden=true; if(issueBtn) issueBtn.setAttribute('aria-expanded','false'); }
+ function issueOpen(){
+  const ti=document.getElementById('issuetitle'), bi=document.getElementById('issuebody');
+  const title=((ti&&ti.value)||'').trim()||lastQ||'Web flasher issue';
+  const desc=((bi&&bi.value)||'').trim()||'(describe what happens, board, screenshot)';
+  const body='**Board:** '+(boardName()||'-')+'\n\n**What happened:**\n'+desc+'\n\n_reported from the ESP Firmware Flasher helper_';
+  const url='https://github.com/'+REPO_SLUG+'/issues/new?title='+encodeURIComponent(title)+'&body='+encodeURIComponent(body);
+  try{ window.open(url,'_blank','noopener'); }catch(e){ location.href=url; }
+ }
+ const RULES=[
+  {l:'No port',k:['no port','not show','not detect','no device','picker empty','port appear'],t:'No port in the picker? Hold <b>BOOT</b>, tap <b>RST</b>, release <b>BOOT</b>, then hit FLASH again. Also: use Chrome/Edge desktop + a data-capable USB cable (charge-only cables are the #1 cause).'},
+  {l:'Port busy',k:['busy','already open','in use','holds','terminal'],t:'Port busy = one app holds it. Close the Terminal on this page first, close Arduino/PlatformIO/serial monitor, unplug/replug, then Connect again.'},
+  {l:'Flash failed',k:['fail','stuck','error','half','stop','verify','wrong'],t:'Flash failed halfway? Use a powered USB port (no unpowered hub), lower baud, keep this tab in front, and confirm the image is a merged file flashed at <b>0x0000</b>.'},
+  {l:'Offsets',k:['offset','0x1000','0x8000','0x10000','merged','partition','bootloader','app-only','app only'],t:'All prebuilt images here are merged — flash at <b>0x0000</b>. Only 0x1000/0x8000/0x10000 for split parts (bootloader / partition / app). Your own split files? Use Your .bin + Add part.'},
+  {l:'Pick a board',k:['which board','select board','board pick','s3','wroom','st7789','ili9341','marauder'],t:'Pick Firmware group + Board in the Select panel. ESP32-S3 boards need native USB; WROOM32 uses serial. The schematic + wiring guide appear in the board card — check them before powering.'},
+  {l:'Custom .bin',k:['your .bin','your bin','custom bin','custom .bin','custom flash','flash my','my own','own file','drop the','drag'],t:'Your own file: Select panel → <b>Your .bin</b> tab → drop it in (it never leaves your machine). Merged image? Leave offset at <b>0x0000</b>. Split bootloader / partition / app files? Hit <b>+ Add part</b> and set 0x1000 / 0x8000 / 0x10000.'},
+  {l:'Chip select',k:['which chip','select chip','chip select','chip setting','chip detect','wrong chip'],t:'The Chip dropdown is auto-detected from your file header — just check it matches your hardware (<b>ESP32</b> vs <b>ESP32-S3</b>). Looks wrong? Change it by hand before flashing; a mismatch aborts instead of bricking.'},
+  {l:'Wiring',k:['wiring','schematic','diagram','pin','connect','display','touch','sd'],t:'Open the board card, click the schematic to zoom, then expand Wiring guide & pin tables. Blank screen / boot loop after flash is almost always wiring.'},
+  {l:'Browser',k:['browser','chrome','edge','firefox','safari','iphone','ipad','android','serial','support'],t:'You need Chrome or Edge desktop (Web Serial). Firefox/Safari cannot flash. iPhones cannot flash over USB at all. Android needs Chrome 148+ with a USB-OTG adapter.'},
+  {l:'Boot log',k:['boot','log','terminal','115200','blank','loop','verify'],t:'After flashing: open Terminal below, Connect at <b>115200</b>, tap RST. No output? Swap cable, check wiring, then re-flash with Erase first.'},
+  {l:'File safety',k:['own bin','custom','my bin','upload','esptool'],t:'Your .bin never leaves your machine — it becomes a local blob URL and streams over USB. Chip + offset are auto-detected from the header. Manual equivalent is shown under Flash.'},
+  {l:'Unbrick',k:['erase','brick','restore','stock'],t:'Changed partition layout or boot loop? Re-open FLASH and tick Erase, flash the merged image at 0x0000 again, then check the boot log.'},
+  {l:'Untested builds',k:['untested'],t:'Two community boards are awaiting their first hardware test — type <b>untested</b> for the live list, or see the Untested build strips on their library cards.'},
+  {l:'Report issue',k:['issue','report','bug','github','problem','ticket','email','mail','contact','author'],t:'Found a bug? Tap <b>🐛 Report an issue</b> below — describe it, hit Open in GitHub, and the issue opens prefilled on <b>'+REPO_SLUG+'</b>. Nothing is filed until you press Submit there.'},
+ ];
+ const QUICK=['No port?','Port busy?','Flash failed','All topics','Report issue'];
+ function scrollLog(){ try{ log.scrollTop=log.scrollHeight; }catch(e){} }
+ function say(who,text,key){
+  const d=document.createElement('div');
+  d.className='botmsg '+(who==='me'?'me':'bot');
+  if(who==='me') d.textContent=text; else d.innerHTML=text;
+  if(who==='bot'&&key){ const v=document.createElement('div'); v.className='botvote';
+   const lab=document.createElement('span'); lab.textContent='Helpful?'; v.appendChild(lab);
+   const up=document.createElement('button'); up.type='button'; up.textContent='👍'; up.setAttribute('aria-label','Answer was helpful');
+   const dn=document.createElement('button'); dn.type='button'; dn.textContent='👎'; dn.setAttribute('aria-label','Answer was not helpful');
+   const done=g=>{ vote(key,g); v.innerHTML='<span>Thanks!</span>'; };
+   up.onclick=()=>done(true); dn.onclick=()=>done(false);
+   v.appendChild(up); v.appendChild(dn); d.appendChild(v); }
+  log.appendChild(d); scrollLog();
+ }
+ function vote(k,good){ try{ const s=JSON.parse(localStorage.getItem('botvotes')||'{}'); s[k]=s[k]||{up:0,down:0}; s[k][good?'up':'down']++; localStorage.setItem('botvotes',JSON.stringify(s)); }catch(e){} }
+ function statsText(){ try{ const s=JSON.parse(localStorage.getItem('botvotes')||'{}'); const ks=Object.keys(s); if(!ks.length) return 'No votes yet — tap 👍 or 👎 under any answer and I will tally them here.'; return 'Votes so far:<br>'+ks.map(k=>'<b>'+k+'</b> 👍'+s[k].up+' 👎'+s[k].down).join('<br>'); }catch(e){ return 'Could not read votes.'; } }
+ function ruleFor(q){
+  const s=String(q||'').toLowerCase();
+  for(const r of RULES){ for(const k of r.k){ if(s.indexOf(k)>=0) return r; } }
+  return null;
+ }
+ function untestedText(){ try{ const u=FIRMWARE.filter(f=>f.untested); if(!u.length) return 'Every board here is tested on real hardware — nothing untested right now.'; return 'Marked untested (nobody has verified them on hardware yet):<br>'+u.map(f=>'<b>'+esc(f.name)+'</b> ('+esc(f.chip)+')').join('<br>')+'<br>Flashing works the same. Got the hardware? Please test and tap <b>🐛 Report an issue</b> with your results — good reports promote a board to tested.'; }catch(e){ return 'Two community boards are awaiting their first test — see the library cards marked Untested build.'; } }
+ function answer(q){
+  const qs=String(q||'').toLowerCase();
+  if(/untested|not tested|untried|experimental/.test(qs)) return untestedText();
+  if(/stats|my votes|feedback/.test(qs)) return statsText();
+  const r=ruleFor(q);
+  if(r) return r.t;
+  return 'I can help with: no port, port busy, flash failed, offsets, wiring, board pick, your own .bin, untested builds, browser support. Try one of the chips below — or open <a href="#help">Troubleshooting</a>.';
+ }
+  function answerLabel(q){
+  const ls=String(q||'').toLowerCase();
+  if(/untested|not tested|untried|experimental/.test(ls)) return 'Untested builds';
+  if(/stats|my votes|feedback/.test(ls)) return 'stats';
+  const r=ruleFor(q);
+  return r?(r.l||'other'):'other';
+ }
+ let greeted=false;
+ function openBot(){
+  panel.classList.add('open'); panel.setAttribute('aria-hidden','false');
+  fab.setAttribute('aria-expanded','true'); fab.textContent='×';
+  if(!greeted){ greeted=true; say('bot','Hey! I can walk you through flashing. What is stuck — port, wiring, or the flash itself?'); }
+  try{ setTimeout(()=>input.focus(),60); }catch(e){}
+ }
+  function closeBot(){
+   try{ if(document.getElementById('botinfo-pop')) document.getElementById('botinfo-pop').hidden=true; }catch(e){}
+   try{ if(document.getElementById('botinfo')) document.getElementById('botinfo').setAttribute('aria-expanded','false'); }catch(e){}
+   try{ if(document.getElementById('botissue-pop')) document.getElementById('botissue-pop').hidden=true; }catch(e){}
+   try{ if(document.getElementById('botissue')) document.getElementById('botissue').setAttribute('aria-expanded','false'); }catch(e){}
+   panel.classList.remove('open'); panel.setAttribute('aria-hidden','true');
+  fab.setAttribute('aria-expanded','false'); fab.textContent='?';
+  try{ fab.focus(); }catch(e){}
+ }
+ fab.onclick=()=>{ panel.classList.contains('open')?closeBot():openBot(); };
+ closeBtn.onclick=closeBot;
+ const infoPop=document.getElementById('botinfo-pop'), infoOk=document.getElementById('botinfo-ok');
+ function infoHide(){ if(infoPop) infoPop.hidden=true; if(infoBtn) infoBtn.setAttribute('aria-expanded','false'); }
+ function infoToggle(){
+  if(!infoPop) return;
+  const show=infoPop.hidden;
+  infoPop.hidden=!show;
+  if(infoBtn) infoBtn.setAttribute('aria-expanded',String(show));
+  if(show&&infoOk){ try{ infoOk.focus(); }catch(e){} }
+ }
+ if(infoBtn) infoBtn.onclick=(e)=>{ e.stopPropagation(); issueHide(); infoToggle(); };
+ if(infoOk) infoOk.onclick=()=>{ infoHide(); try{ input.focus(); }catch(e){} };
+ document.addEventListener('click',e=>{ if(infoPop&&!infoPop.hidden&&panel.classList.contains('open')&&!panel.contains(e.target)) infoHide(); });
+ document.addEventListener('click',e=>{ const ip=document.getElementById('botissue-pop'); if(ip&&!ip.hidden&&panel.classList.contains('open')&&!panel.contains(e.target)) issueHide(); });
+ document.addEventListener('keydown',e=>{ if(e.key!=='Escape'||!panel.classList.contains('open')) return; const ip=document.getElementById('botissue-pop'); if(ip&&!ip.hidden){ issueHide(); return; } if(infoPop&&!infoPop.hidden){ infoHide(); return; } closeBot(); });
+ chips.innerHTML=QUICK.map(q=>'<button type="button">'+q+'</button>').join('');
+ chips.querySelectorAll('button').forEach(b=>{ b.onclick=()=>{ const t=b.textContent; if(/report|issue/i.test(t)){ lastQ=input.value||lastQ; issueShow(); return; } if(/all topics/i.test(t)){ showTopics(); return; } say('me',t); lastQ=t; say('bot',answer(t),answerLabel(t)); }; });
+ function showTopics(){
+  const d=document.createElement('div'); d.className='botmsg bot';
+  d.innerHTML='<b>All topics</b> — tap one:';
+  const w=document.createElement('div'); w.className='botlist';
+  RULES.forEach(r=>{ const x=document.createElement('button'); x.type='button'; x.textContent=r.l||r.k[0];
+   x.onclick=()=>{ say('me',x.textContent); lastQ=x.textContent; if(/report|issue/i.test(x.textContent)){ issueShow(); return; } say('bot',answer(x.textContent),answerLabel(x.textContent)); };
+   w.appendChild(x); });
+  d.appendChild(w); log.appendChild(d); scrollLog();
+ }
+ function submit(){
+  const v=(input.value||'').trim(); if(!v) return;
+  lastQ=v; say('me',v); input.value=''; const r=answer(v); say('bot',r,answerLabel(v));
+ }
+ send.onclick=submit;
+ if(issueBtn) issueBtn.onclick=(e)=>{ e.stopPropagation(); issueShow(); };
+ const issueCancel=document.getElementById('issuecancel'), issueGo=document.getElementById('issueopen');
+ if(issueCancel) issueCancel.onclick=()=>{ issueHide(); try{ input.focus(); }catch(e){} };
+ if(issueGo) issueGo.onclick=()=>{ issueOpen(); };
+ input.addEventListener('keydown',e=>{ if(e.key==='Enter'){ e.preventDefault(); submit(); } });
+})();
+</script>
+</body>
+</html>
