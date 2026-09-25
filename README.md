@@ -68,25 +68,22 @@ to HTTPS or `localhost`.
 vercel --prod      # or: push to a repo and import it in the dashboard
 ```
 
-### After the first deploy
+### Deploy your own
 
-1. **Import and deploy** — Vercel → Add New → Project → this repo → Deploy. No
-   build step, no build settings; free HTTPS and a redeploy on every push.
-2. **Point the social card at the real origin.** `og:url`, `og:image`,
-   `twitter:image` and `<link rel="canonical">` all carry a placeholder origin.
-   Swap every one of them for your production URL once the domain is decided —
-   there is a marked comment in `index.html`'s `<head>` saying exactly where.
-3. **Optional — comments.** The Discussion band is built but inert: it stays
-   hidden and requests nothing from `giscus.app` until it is configured. To
-   switch it on, enable Discussions (repo → Settings → General → Features),
-   install https://github.com/apps/giscus on the repo, then paste `category`
-   and `categoryId` from https://giscus.app into the `GISCUS` object at the top
-   of the script in `index.html`, then fill `repoId` with the repo's node id
-   (`gh api repos/<owner>/<repo> --jq .node_id`). All three stay blank until
-   then, so nothing loads.
-4. **Optional — a free subdomain.** `is-a.dev` and `runs-on.dev` both allocate
-   subdomains through a pull request that adds one small JSON file pointing a
-   CNAME at your Vercel URL.
+Fork it, import the fork in Vercel (no build settings), done. On other hosts,
+copy the CORS and content-type headers from `vercel.json` over.
+
+<details>
+<summary>Maintainer checklist</summary>
+
+- **Social card origin.** `og:url`, `og:image`, `twitter:image` and the
+  canonical link carry a placeholder origin — swap them for the production URL
+  (marked comment in `index.html`'s `<head>`).
+- **Comments (optional).** Enable Discussions, install the giscus app, then
+  paste `category` / `categoryId` from giscus.app plus the repo's node id
+  (`repoId`) into `GISCUS` in `index.html`.
+
+</details>
 
 ## Add a board
 
