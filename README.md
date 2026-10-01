@@ -33,7 +33,7 @@ Charge-only cables are the number one reason flashing fails.
 | `boards.js` | **The one file to edit.** Every board with its chip, file, hash and assets |
 | `manifests/*.json` | One ESP Web Tools manifest per firmware |
 | `firmware/*.bin` | The prebuilt images |
-| `diagrams/*.png` | Wiring diagrams, one per chip |
+| `diagrams/*.png` | Wiring diagrams, one per build (buttons vs touch) |
 | `connections/*.md` | Per-board pin tables and wiring notes |
 | `fonts/`, `images/` | Self-hosted fonts, theme backdrops, social card |
 | `vercel.json` | CORS and content-type headers the flashed files need |

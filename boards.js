@@ -3,8 +3,12 @@
 //    app-only builds set offset:0x10000 and erase stays off in their manifest)
 // 2. Copy one entry below, change name/group/chip/file (+sha via Get-FileHash).
 // 3. Optional: diagram png in diagrams/, wiring guide md in connections/.
-//    Diagrams are per-chip (a panel swaps by firmware define, not by wiring), so reuse the
-//    chip's diagram unless the new board genuinely wires differently.
+//    Diagrams are per-input (buttons vs touch), NOT per-chip: a WROOM32 button
+//    build and a WROOM32 touch build wire differently, so they must NOT share
+//    one png. S3 touch builds share wiring (T_CS GPIO 3) but keep separate
+//    files so each card can carry its own display title.
+//    To swap in the simplified TFT-only artwork, overwrite the png bytes in
+//    place — no boards.js change needed.
 // Site, filters and flash buttons update automatically. No other file to touch.
 const FIRMWARE = [
   {id:'wroom32-ili9341', group:'Bruce', chip:'ESP32',
@@ -13,7 +17,7 @@ const FIRMWARE = [
    manifest:'manifests/manifest-esp-wroom32-ili9341.json',
    file:'firmware/Bruce-esp-wroom32-ili9341.bin',
    sha:'1fdf7bde79e63450a1eb8fe1306df7c66d340d8030969e9f3486d4beab6d7065',
-   diagram:'diagrams/espwroom32_wiring.png',
+   diagram:'diagrams/espwroom32-ili9341-buttons.png',
    guide:'connections/esp-wroom32-ili9341.md'},
   {id:'wroom32-st7789', group:'Bruce', chip:'ESP32',
    name:'Bruce ESP-WROOM-32 + ST7789 2.8"',
@@ -21,7 +25,7 @@ const FIRMWARE = [
    manifest:'manifests/manifest-esp-wroom32-st7789.json',
    file:'firmware/Bruce-esp-wroom32-st7789.bin',
    sha:'8e57994ef1b2f4bc055e74e589c63d83d79fe04919859b2e754e6257577284d6',
-   diagram:'diagrams/espwroom32_wiring.png',
+   diagram:'diagrams/espwroom32-st7789-touch.png',
    guide:'connections/esp-wroom32-st7789.md'},
   {id:'s3-ili9341', group:'Bruce', chip:'ESP32-S3',
    name:'Bruce ESP32-S3 + ILI9341 2.8"',
@@ -29,7 +33,7 @@ const FIRMWARE = [
    manifest:'manifests/manifest-esp32s3-ili9341.json',
    file:'firmware/Bruce-esp32s3-ili9341.bin',
    sha:'a799bfe1616ea887b269208c3351681e2620b3376e9c862ec0d21628b2e1d979',
-   diagram:'diagrams/esp32s3_wiring.png',
+   diagram:'diagrams/esp32s3-ili9341-touch.png',
    guide:'connections/esp32s3-ili9341.md'},
   {id:'s3-st7789', group:'Bruce', chip:'ESP32-S3',
    name:'Bruce ESP32-S3 + ST7789 2.8"',
@@ -37,7 +41,7 @@ const FIRMWARE = [
    manifest:'manifests/manifest-esp32s3-st7789.json',
    file:'firmware/Bruce-esp32s3-st7789.bin',
    sha:'af51250444ee2b674290381438c85d81038334a2551d1a723dd12cd9d89cf79a',
-   diagram:'diagrams/esp32s3_wiring.png',
+   diagram:'diagrams/esp32s3-st7789-touch.png',
    guide:'connections/esp32s3-st7789.md'},
   {id:'marauder-s3-st7789', group:'Marauder', chip:'ESP32-S3',
    name:'Marauder ESP32-S3 + ST7789 2.8"',
@@ -45,7 +49,7 @@ const FIRMWARE = [
    manifest:'manifests/manifest-marauder-s3-st7789-16mb.json',
    file:'firmware/Marauder-esp32s3-st7789-16MB.bin',
    sha:'42d153483ed6a5c5a4da4096ff895c5c7feab8aa96aa35f563ce925f3b149fb9',
-   diagram:'diagrams/esp32s3_wiring.png',
+   diagram:'diagrams/esp32s3-st7789-touch.png',
    guide:'connections/esp32s3-st7789.md'},
   {id:'marauder-wroom32-ili9341', group:'Marauder', chip:'ESP32',
    name:'Marauder ESP-WROOM-32 + ILI9341 2.4"',
@@ -53,7 +57,7 @@ const FIRMWARE = [
    manifest:'manifests/manifest-marauder-wroom32-ili9341.json',
    file:'firmware/Marauder-esp-wroom32-ili9341.bin',
    sha:'dc45f50c3eaab439d83862db888a2e63bf83fa1748135857af1918d4d7fab868',
-   diagram:'diagrams/espwroom32_wiring.png',
+   diagram:'diagrams/espwroom32-ili9341-buttons.png',
    guide:'connections/esp-wroom32-ili9341.md'},
   {id:'marauder-wroom32-st7789', group:'Marauder', chip:'ESP32',
    name:'Marauder ESP-WROOM-32 + ST7789 2.8"',
@@ -61,7 +65,7 @@ const FIRMWARE = [
    manifest:'manifests/manifest-marauder-wroom32-st7789.json',
    file:'firmware/Marauder-esp-wroom32-st7789.bin',
    sha:'798c699cbd625754bec0ca1335197cb021fd909c36163ba0394b7b22bd5b374d',
-   diagram:'diagrams/espwroom32_wiring.png',
+   diagram:'diagrams/espwroom32-st7789-touch.png',
    guide:'connections/esp-wroom32-st7789.md'},
   {id:'marauder-s3-ili9341', group:'Marauder', chip:'ESP32-S3',
    untested:true,
@@ -70,7 +74,7 @@ const FIRMWARE = [
    manifest:'manifests/manifest-marauder-s3-ili9341-16mb.json',
    file:'firmware/Marauder-esp32s3-ili9341-16MB.bin',
    sha:'f44ad380ada0c63de0118531bd0a13438ad1a113df2e7fde26580c86c6a3f270',
-   diagram:'diagrams/esp32s3_wiring.png',
+   diagram:'diagrams/esp32s3-ili9341-touch.png',
    guide:'connections/esp32s3-ili9341.md'},
   {id:'marauder-wroom32-ili9341-touch', group:'Marauder', chip:'ESP32',
    untested:true,
@@ -79,6 +83,23 @@ const FIRMWARE = [
    manifest:'manifests/manifest-marauder-wroom32-ili9341-touch.json',
    file:'firmware/Marauder-esp-wroom32-ili9341-touch.bin',
    sha:'5acd1fa63f6aa1d05da65c6faf5c22e8b3fa74ceee0682d3280ffe05e640dae7',
-   diagram:'diagrams/espwroom32_wiring.png',
+   diagram:'diagrams/espwroom32-st7789-touch.png',
+   guide:'connections/esp-wroom32-ili9341-touch.md'},
+  {id:'flipper-esp32-ili9341', group:'Flipper', chip:'ESP32',
+   name:'Flipper ESP-WROOM-32 + ILI9341 2.4"',
+   desc:'5-way buttons, VALIDATED golden — flash at 0x0000 with Erase',
+   manifest:'manifests/manifest-flipper-esp32-ili9341.json',
+   file:'firmware/Flipper-esp32-ili9341.bin',
+   sha:'2e7e32cb411bd4c69ad5629d4e92c0391826aff68e325f7869b0539221ec6d4f',
+   diagram:'diagrams/espwroom32-ili9341-buttons.png',
    guide:'connections/esp-wroom32-ili9341.md'},
+  {id:'flipper-s3-ili9341-touch', group:'Flipper', chip:'ESP32-S3',
+   untested:true,
+   name:'Flipper ESP32-S3 + ILI9341 2.4/2.8" touch',
+   desc:'NOT validated — built clean, display/touch unconfirmed — flash at 0x0000 with Erase',
+   manifest:'manifests/manifest-flipper-s3-ili9341-touch.json',
+   file:'firmware/Flipper-esp32s3-ili9341-touch.bin',
+   sha:'29ed223bbe40edbf67f7706261d5d95c94b4dfea67505aa3a86bc58ccf3ed69d',
+   diagram:'diagrams/esp32s3-ili9341-touch.png',
+   guide:'connections/esp32s3-ili9341.md'},
 ];

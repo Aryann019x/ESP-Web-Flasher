@@ -1,18 +1,18 @@
-# ESP-WROOM32 with ST7789 Display & Touchscreen Wiring Guide
+# ESP-WROOM32 with ILI9341 Display & Touchscreen Wiring Guide
 
-This board features an ESP32 microcontroller paired with a 2.8" ST7789 display with integrated XPT2046 resistive touchscreen.
+This board features an ESP32 microcontroller paired with a 2.4"/2.8" ILI9341 display with XPT2046 resistive touchscreen (community / untested build — same wiring as the ST7789 touch build, different firmware define).
 
 ## Components
 
 - **MCU**: ESP-WROOM32 (ESP32)
-- **Display**: ST7789 2.8" SPI TFT LCD with RGB-BGR color order (240x320)
+- **Display**: ILI9341 SPI TFT LCD (240x320)
 - **Touchscreen**: XPT2046 resistive touch controller (shares SPI bus)
 - **SD Card**: Slot on main SPI bus
 - **Button**: Single boot button (GPIO0; active-LOW)
 - **LED**: Single status LED
 - **Communication**: SPI for display/touch/SD card, I2C for sensors
 
-## Display Pinout (ST7789)
+## Display Pinout (ILI9341)
 
 | Display Pin | ESP32 Pin | Purpose |
 |---|---|---|
@@ -39,6 +39,8 @@ The touchscreen shares the SPI bus (MOSI/MISO/SCK) with the display but has sepa
 | SCK | 18 | Clock (shared with display) |
 | CS | 21 | Chip Select (touch only — WROOM32 uses GPIO 21; S3 builds use GPIO 3, do not mix) |
 | IRQ | Not used | Interrupt (optional) |
+
+> Same wiring as the WROOM32 ST7789 touch build — only the firmware display define differs.
 
 ## SD Card Slot Pinout
 

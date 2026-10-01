@@ -1,0 +1,1 @@
+{"builds": [{"chipFamily": "ESP32", "parts": [{"offset": 0, "path": "../firmware/Flipper-esp32-ili9341.bin"}]}], "name": "Flipper ESP-WROOM-32 + ILI9341 2.4 TFT (5-way)", "new_install_prompt_erase": true, "version": "2026-10-01"}
