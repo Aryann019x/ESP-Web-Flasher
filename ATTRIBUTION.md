@@ -14,6 +14,7 @@ open-source projects. They are **not** covered by this repo's MIT license:
 
 - **Bruce** builds — source: https://github.com/BruceDevices/firmware
 - **Marauder** builds — source: https://github.com/justcallmekoko/ESP32Marauder
+- **Flipper** builds — DIY companion firmware, built from the local tree (validation status in `BOARDS_STATUS.md`; golden WROOM32 ILI9341 validated on hardware, S3 ILI9341 touch build clean but display/touch unconfirmed)
 
 Each board card shows the SHA-256 of its image so downloads can be verified
 against official releases. Use these tools only on hardware and networks you
