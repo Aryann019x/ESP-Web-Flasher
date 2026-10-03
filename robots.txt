@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://esp-web-flasher.runs-on.dev/sitemap.xml
