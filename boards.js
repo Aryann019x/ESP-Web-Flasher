@@ -6,7 +6,8 @@
 //    Diagrams are per-input (buttons vs touch), NOT per-chip: a WROOM32 button
 //    build and a WROOM32 touch build wire differently, so they must NOT share
 //    one png. Bruce cards use the full-rig artwork (TFT + NRF24 + IR + battery);
-//    Marauder/Flipper cards use the simplified TFT-only artwork.
+//    Marauder cards use the simplified TFT-only artwork; Flipper cards reuse the
+//    Bruce full-rig artwork.
 // Site, filters and flash buttons update automatically. No other file to touch.
 const FIRMWARE = [
   {id:'wroom32-ili9341', group:'Bruce', chip:'ESP32',
@@ -84,8 +85,8 @@ const FIRMWARE = [
    diagram:'diagrams/espwroom32-st7789-touch.png',
    guide:'connections/esp-wroom32-ili9341-touch.md'},
   {id:'flipper-esp32-ili9341', group:'Flipper', chip:'ESP32',
-   name:'Flipper ESP-WROOM-32 + ILI9341 2.4"',
-   desc:'5-way buttons, VALIDATED golden — flash at 0x0000 with Erase',
+   name:'Flipper ESP-WROOM-32 + ILI9341 2.4" joystick',
+   desc:'Joystick / 5-way buttons, VALIDATED golden — flash at 0x0000 with Erase',
    manifest:'manifests/manifest-flipper-esp32-ili9341.json',
    file:'firmware/Flipper-esp32-ili9341.bin',
    sha:'2e7e32cb411bd4c69ad5629d4e92c0391826aff68e325f7869b0539221ec6d4f',
