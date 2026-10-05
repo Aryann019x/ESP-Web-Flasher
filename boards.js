@@ -11,7 +11,7 @@
 // Site, filters and flash buttons update automatically. No other file to touch.
 const FIRMWARE = [
   {id:'wroom32-ili9341', group:'Bruce', chip:'ESP32',
-   name:'Bruce ESP-WROOM-32 + ILI9341 2.4"',
+   name:'Bruce ESP-WROOM-32 + ILI9341 2.4" joystick',
    desc:'5-way buttons, no touch',
    manifest:'manifests/manifest-esp-wroom32-ili9341.json',
    file:'firmware/Bruce-esp-wroom32-ili9341.bin',
@@ -51,7 +51,7 @@ const FIRMWARE = [
    diagram:'diagrams/esp32s3-st7789-touch.png',
    guide:'connections/esp32s3-st7789.md'},
   {id:'marauder-wroom32-ili9341', group:'Marauder', chip:'ESP32',
-   name:'Marauder ESP-WROOM-32 + ILI9341 2.4"',
+   name:'Marauder ESP-WROOM-32 + ILI9341 2.4" joystick',
    desc:'Joystick, merged — flash at 0x0000 with Erase',
    manifest:'manifests/manifest-marauder-wroom32-ili9341.json',
    file:'firmware/Marauder-esp-wroom32-ili9341.bin',
