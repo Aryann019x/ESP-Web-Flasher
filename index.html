@@ -470,10 +470,12 @@ a.linebtn[aria-disabled="true"]{color:var(--faint);border-style:dashed;cursor:no
 .lmeta .badge{margin-left:0;flex:none}
 .lstatus{display:flex;align-items:center;gap:7px;font-family:var(--fpx);font-size:.56rem;letter-spacing:.08em;text-transform:uppercase;color:var(--faint)}
 .lstatus i{flex:none;width:6px;height:6px;border-radius:50%;background:#f59e0b;box-shadow:0 0 8px rgba(245,158,11,.8)}
+.lwarn{font-size:.7rem;line-height:1.4;color:var(--mut);border-left:2px solid rgba(217,119,6,.6);background:rgba(217,119,6,.08);border-radius:0 6px 6px 0;padding:6px 8px}
+html[data-theme="light"] .lwarn{background:rgba(217,119,6,.06);color:#7c4a03}
 .badge.warn{border-color:rgba(217,119,6,.55);color:#f59e0b;background:rgba(217,119,6,.1)}
 .lgroup{font-family:var(--fpx);font-size:.5rem;letter-spacing:.09em;text-transform:uppercase;color:var(--faint);border:var(--hair);border-radius:999px;padding:2px 7px}
 .lcard h3{margin:0;font-size:.84rem;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.lcard p{margin:0;color:var(--mut);font-size:.75rem;line-height:1.45;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lcard p{margin:0;color:var(--mut);font-size:.75rem;line-height:1.45;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
 .lcard .lgo{margin-top:auto}
 .lcard .lgo button{width:100%;height:34px;font-size:.58rem}
 .lcard .lgo button:disabled{opacity:.55;cursor:not-allowed}
@@ -752,13 +754,14 @@ html[data-theme="light"] md-menu{--md-menu-container-color:#F0EFEB;--md-list-ite
 <div class="bwrap">
 <header class="bhead">
 <h2 class="sec">Troubleshooting</h2>
-<p>The four things that actually go wrong, and what fixes each one.</p>
+<p>The things that actually go wrong, and what fixes each one.</p>
 </header>
 <div class="faq">
 <details><summary>No port appears in the picker</summary><div>Hold <b>BOOT</b>, tap <b>RST</b>, release <b>BOOT</b>, then press Flash again. Boards without a USB-serial chip also need a data-capable cable — charge-only cables are the most common cause.</div></details>
 <details><summary>The port is busy</summary><div>One application owns a serial port at a time. Close the terminal on this page first, and close any other serial monitor or IDE that may be holding the port, then reconnect.</div></details>
 <details><summary>The flash failed part-way</summary><div>Reconnect at a lower baud rate, use a powered USB port rather than an unpowered hub, and make sure the image matches its offset — every prebuilt here is merged at <code>0x0000</code> (custom split files use Your .bin + Add part).</div></details>
 <details><summary>Flash succeeds but the screen stays black</summary><div>Check the wiring guide — wrong display pins give a lit-but-blank screen even when the firmware boots fine. On 16MB quad-SPI S3 modules a QIO 80MHz header watchdog-loops at boot — the S3 image here is already patched to DIO 40MHz, which the SHA-256 row reflects.</div></details>
+<details><summary>Screen works but touch does nothing</summary><div>You probably flashed the build for the other panel controller. ST7789 and ILI9341 are not interchangeable: the wrong image can still light the screen because their init commands overlap, but the touch calibration is different, so taps miss or do nothing. Pick the card that matches the panel printed on your board, then flash again at <b>0x0000</b> with Erase. Display CS and touch CS are separate, so the shared MOSI/MISO/SCK bus is not the problem.</div></details>
 <details><summary>The browser says Web Serial is unsupported</summary><div>Web Serial needs a desktop Chromium browser — Chrome or Edge 89 and newer. Firefox, Safari and most mobile browsers do not implement it yet.</div></details>
 </div>
 </div>
@@ -1071,7 +1074,7 @@ async function renderDetail(){
   try{bsel.title='';gsel.title=gsel.options[gsel.selectedIndex]?gsel.options[gsel.selectedIndex].text:'';}catch(e){}
   return;
  }
-  let h='<div class="dhead"><h2>'+f.name+'<span class="badge">'+f.chip+'</span></h2>'+(f.diagram?'<span class="dmeta">Schematic · click to zoom</span>':'')+'</div>'+(f.untested?'<div class="lstatus" title="Nobody has verified this on real hardware yet — flash it, test it, and report back via the helper"><i></i>Untested build</div>':'')+'<div class="desc">'+f.desc+'</div>';
+  let h='<div class="dhead"><h2>'+f.name+'<span class="badge">'+f.chip+'</span></h2>'+(f.diagram?'<span class="dmeta">Schematic · click to zoom</span>':'')+'</div>'+(f.untested?'<div class="lstatus" title="Nobody has verified this on real hardware yet — flash it, test it, and report back via the helper"><i></i>Untested build</div>':'')+'<div class="desc">'+f.desc+'</div>'+(f.warning?'<div class="warn">'+esc(f.warning)+'</div>':'');
   if(f.missing){ h+='<div class="missing">'+f.missing+'</div>'; }
   else{
   if(f.diagram) h+='<div class="shot"><img id="thumb" src="'+f.diagram+'" alt="schematic preview" title="Click for full-screen"></div>';
@@ -1453,7 +1456,7 @@ function renderLibrary(){
  if(!libgrid) return;
  libgrid.innerHTML=FIRMWARE.map(f=>{
    return '<article class="lcard"><div class="lmeta"><span class="lgroup">'+esc(f.group)+'</span><span class="badge">'+esc(f.chip)+'</span>'+(fwOff(f)?'<span class="badge" title="App-only image, flashed at this offset"> '+hexAddr(fwOff(f))+'</span>':'')+'</div>'
-   +'<h3>'+esc(f.name)+'</h3>'+(f.untested?'<div class="lstatus" title="Nobody has verified this on real hardware yet — flash it, test it, and report back via the helper"><i></i>Untested build</div>':'')+'<p>'+esc(f.desc)+'</p>'
+   +'<h3>'+esc(f.name)+'</h3>'+(f.untested?'<div class="lstatus" title="Nobody has verified this on real hardware yet — flash it, test it, and report back via the helper"><i></i>Untested build</div>':'')+'<p>'+esc(f.desc)+'</p>'+(f.warning?'<div class="lwarn">'+esc(f.warning)+'</div>':'')
    +'<div class="lgo"><button type="button" class="line" data-fw="'+f.id+'">'+(f.missing?'Bin not bundled':'Flash this board')+'</button></div></article>';
  }).join('');
  libgrid.querySelectorAll('button[data-fw]').forEach(b=>{
@@ -1820,7 +1823,8 @@ try{
   {l:'Port busy',k:['busy','already open','in use','holds','terminal'],t:'Port busy = one app holds it. Close the Terminal on this page first, close Arduino/PlatformIO/serial monitor, unplug/replug, then Connect again.'},
   {l:'Flash failed',k:['fail','stuck','error','half','stop','verify','wrong'],t:'Flash failed halfway? Use a powered USB port (no unpowered hub), lower baud, keep this tab in front, and confirm the image is a merged file flashed at <b>0x0000</b>.'},
   {l:'Offsets',k:['offset','0x1000','0x8000','0x10000','merged','partition','bootloader','app-only','app only'],t:'All prebuilt images here are merged — flash at <b>0x0000</b>. Only 0x1000/0x8000/0x10000 for split parts (bootloader / partition / app). Your own split files? Use Your .bin + Add part.'},
-  {l:'Pick a board',k:['which board','select board','board pick','s3','wroom','st7789','ili9341','marauder'],t:'Pick Firmware group + Board in the Select panel. ESP32-S3 boards need native USB; WROOM32 uses serial. The schematic + wiring guide appear in the board card — check them before powering.'},
+  {l:'Touch dead',k:['touch not','touchscreen not','no touch','touch dead','touch doesn','touch stopped','touch unresponsive'],t:'Screen works but touch does nothing? Check the panel type first. ST7789 and ILI9341 builds are not interchangeable: the wrong image can still display, but touch will not map. Flash the card that matches the panel printed on your board at <b>0x0000</b> with Erase. Display CS and touch CS are separate, so a shared MOSI/MISO/SCK bus is normal.'},
+  {l:'Pick a board',k:['which board','select board','board pick','s3','wroom','st7789','ili9341','marauder'],t:'Pick Firmware group + Board in the Select panel. ESP32-S3 boards need native USB; WROOM32 uses serial. ST7789 and ILI9341 cards are different panels, so pick the one printed on your board. The schematic + wiring guide appear in the board card — check them before powering.'},
   {l:'Custom .bin',k:['your .bin','your bin','custom bin','custom .bin','custom flash','flash my','my own','own file','drop the','drag'],t:'Your own file: Select panel → <b>Your .bin</b> tab → drop it in (it never leaves your machine). Merged image? Leave offset at <b>0x0000</b>. Split bootloader / partition / app files? Hit <b>+ Add part</b> and set 0x1000 / 0x8000 / 0x10000.'},
   {l:'Chip select',k:['which chip','select chip','chip select','chip setting','chip detect','wrong chip'],t:'The Chip dropdown is auto-detected from your file header — just check it matches your hardware (<b>ESP32</b> vs <b>ESP32-S3</b>). Looks wrong? Change it by hand before flashing; a mismatch aborts instead of bricking.'},
   {l:'Wiring',k:['wiring','schematic','diagram','pin','connect','display','touch','sd'],t:'Open the board card, click the schematic to zoom, then expand Wiring guide & pin tables. Blank screen / boot loop after flash is almost always wiring.'},
