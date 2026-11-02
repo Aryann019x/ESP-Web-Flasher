@@ -30,7 +30,7 @@
 <title>ESP Firmware Flasher — Bruce, Marauder & Flipper, no install</title>
 <script type="module" src="https://unpkg.com/esp-web-tools@10/dist/web/install-button.js?module"></script>
 <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-<script src="boards.js?v=20"></script>
+<script src="boards.js?v=21"></script>
 <style>
 @font-face{font-family:'Departure Mono';font-style:normal;font-weight:400;font-display:swap;src:url(fonts/departure-mono-400.woff2) format('woff2')}
 @font-face{font-family:'JetBrains Mono';font-style:normal;font-weight:400;font-display:swap;src:url(fonts/jetbrains-mono-400-latin-ext.woff2) format('woff2');unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF}
@@ -38,8 +38,8 @@
 *{box-sizing:border-box}
 [hidden]{display:none!important}
 esp-web-install-button{--esp-tools-button-color:#f5f5f5;--esp-tools-button-text-color:#000;--esp-tools-button-border-radius:10px}
-:root{--bg:#171717;--panel:#202020;--panel2:#1e1e1e;--line:#2c2c2c;--line2:#383838;--txt:#F3F3F3;--mut:#969696;--faint:#7f7f7f;--soft:#161616;--btnbg:linear-gradient(180deg,#f4f4f4,#d9d9d9);--btnink:#161616;--codebg:#262626;--codetxt:#e2e2e2;--headerbg:rgba(23,23,23,.8);--modalbg:rgba(10,10,10,.88);--glowtop:#1e1e1e;--gridline:rgba(200,200,200,.06);--r:20px;--r-in:12px;--r-ctl:10px;--r-sm:8px;--h-ctl:38px;--acc:0,229,255;--bloom:rgba(150,160,175,.05);--cardbg:linear-gradient(175deg,color-mix(in srgb,var(--panel) 78%,transparent),color-mix(in srgb,var(--panel2) 84%,transparent));--cardline:1px solid rgba(255,255,255,.06);--edge:rgba(255,255,255,.1);--edge-h:rgba(255,255,255,.14);--ctl-line:1px solid rgba(255,255,255,.08);--hair:1px solid rgba(255,255,255,.06);--dash:1.5px dashed rgba(255,255,255,.1);--cardsh:0 1px 0 rgba(255,255,255,.05) inset,0 1px 2px rgba(0,0,0,.2),0 20px 50px -24px rgba(0,0,0,.6);--cardsh-h:0 1px 0 rgba(255,255,255,.07) inset,0 1px 2px rgba(0,0,0,.2),0 28px 60px -26px rgba(0,0,0,.65),0 0 40px -12px rgba(var(--acc),.1);--platesh:0 26px 50px -28px rgba(0,0,0,.9),0 4px 14px -8px rgba(0,0,0,.5);--fpx:'Departure Mono',monospace;--fui:'Inter','Manrope','DM Sans',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;--fmono:'JetBrains Mono','IBM Plex Mono',ui-monospace,SFMono-Regular,Menlo,Consolas,'Liberation Mono',monospace;--neon:#00e5ff}
-html[data-theme="light"]{--bg:#E8E7E2;--panel:#F0EFEB;--panel2:#EAE8E2;--line:#d6d2c7;--line2:#c4c0b4;--txt:#252525;--mut:#777777;--faint:#6f7681;--soft:#dbd9d1;--btnbg:linear-gradient(180deg,#33363d,#17181c);--btnink:#f4f4f2;--codebg:#E2E0D9;--codetxt:#2b2e33;--headerbg:rgba(227,225,218,.8);--modalbg:rgba(227,225,218,.92);--glowtop:#d8d5cb;--gridline:rgba(60,65,75,.09);--neon:#0369a1;--acc:3,105,161;--bloom:rgba(3,105,161,.06);--cardline:1px solid rgba(30,40,55,.14);--edge:rgba(30,40,55,.14);--edge-h:rgba(30,40,55,.18);--ctl-line:1px solid rgba(30,40,55,.16);--hair:1px solid rgba(30,40,55,.1);--dash:1.5px dashed rgba(30,40,55,.24);--cardsh:0 1px 0 rgba(255,255,255,.5) inset,0 1px 3px rgba(30,40,55,.07),0 6px 16px -6px rgba(30,40,55,.1);--cardsh-h:0 1px 0 rgba(255,255,255,.6) inset,0 2px 5px rgba(30,40,55,.1),0 10px 24px -8px rgba(30,40,55,.14);--cardbg:linear-gradient(175deg,color-mix(in srgb,var(--panel) 88%,transparent),color-mix(in srgb,var(--panel2) 92%,transparent))}
+:root{--bg:#171717;--panel:#202020;--panel2:#1e1e1e;--line:#2c2c2c;--line2:#383838;--txt:#F3F3F3;--mut:#969696;--faint:#7f7f7f;--soft:#161616;--btnbg:linear-gradient(180deg,#f4f4f4,#d9d9d9);--btnink:#161616;--codebg:#262626;--codetxt:#e2e2e2;--headerbg:rgba(23,23,23,.8);--modalbg:rgba(10,10,10,.88);--glowtop:#1e1e1e;--gridline:rgba(200,200,200,.06);--r:20px;--r-in:12px;--r-ctl:10px;--r-sm:8px;--h-ctl:38px;--acc:0,229,255;--alert:255,90,90;--bloom:rgba(150,160,175,.05);--cardbg:linear-gradient(175deg,color-mix(in srgb,var(--panel) 78%,transparent),color-mix(in srgb,var(--panel2) 84%,transparent));--cardline:1px solid rgba(255,255,255,.06);--edge:rgba(255,255,255,.1);--edge-h:rgba(255,255,255,.14);--ctl-line:1px solid rgba(255,255,255,.08);--hair:1px solid rgba(255,255,255,.06);--dash:1.5px dashed rgba(255,255,255,.1);--cardsh:0 1px 0 rgba(255,255,255,.05) inset,0 1px 2px rgba(0,0,0,.2),0 20px 50px -24px rgba(0,0,0,.6);--cardsh-h:0 1px 0 rgba(255,255,255,.07) inset,0 1px 2px rgba(0,0,0,.2),0 28px 60px -26px rgba(0,0,0,.65),0 0 40px -12px rgba(var(--acc),.1);--platesh:0 26px 50px -28px rgba(0,0,0,.9),0 4px 14px -8px rgba(0,0,0,.5);--fpx:'Departure Mono',monospace;--fui:'Inter','Manrope','DM Sans',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;--fmono:'JetBrains Mono','IBM Plex Mono',ui-monospace,SFMono-Regular,Menlo,Consolas,'Liberation Mono',monospace;--neon:#00e5ff}
+html[data-theme="light"]{--bg:#E8E7E2;--panel:#F0EFEB;--panel2:#EAE8E2;--line:#d6d2c7;--line2:#c4c0b4;--txt:#252525;--mut:#777777;--faint:#6f7681;--soft:#dbd9d1;--btnbg:linear-gradient(180deg,#33363d,#17181c);--btnink:#f4f4f2;--codebg:#E2E0D9;--codetxt:#2b2e33;--headerbg:rgba(227,225,218,.8);--modalbg:rgba(227,225,218,.92);--glowtop:#d8d5cb;--gridline:rgba(60,65,75,.09);--neon:#0369a1;--acc:3,105,161;--alert:190,38,38;--bloom:rgba(3,105,161,.06);--cardline:1px solid rgba(30,40,55,.14);--edge:rgba(30,40,55,.14);--edge-h:rgba(30,40,55,.18);--ctl-line:1px solid rgba(30,40,55,.16);--hair:1px solid rgba(30,40,55,.1);--dash:1.5px dashed rgba(30,40,55,.24);--cardsh:0 1px 0 rgba(255,255,255,.5) inset,0 1px 3px rgba(30,40,55,.07),0 6px 16px -6px rgba(30,40,55,.1);--cardsh-h:0 1px 0 rgba(255,255,255,.6) inset,0 2px 5px rgba(30,40,55,.1),0 10px 24px -8px rgba(30,40,55,.14);--cardbg:linear-gradient(175deg,color-mix(in srgb,var(--panel) 88%,transparent),color-mix(in srgb,var(--panel2) 92%,transparent))}
 html[data-theme="light"] .badge{border-color:rgba(3,105,161,.4);color:var(--neon);background:rgba(3,105,161,.07);box-shadow:none}
 html[data-theme="light"] select:focus{box-shadow:0 0 0 3px rgba(3,105,161,.12)}
 html[data-theme="light"] .term .row button:not(.primary){background:color-mix(in srgb,var(--txt) 5%,transparent);color:var(--txt);border:var(--ctl-line)}
@@ -376,6 +376,24 @@ details[open] summary:hover::after{color:var(--txt);border-color:rgba(var(--acc)
 code{font-family:var(--fmono);background:var(--codebg);color:var(--codetxt);padding:2px 6px;border-radius:var(--r-sm);font-size:.85em}
 .warn{border:1px solid rgba(255,255,255,.05);border-left:2px solid rgba(var(--acc),.4);border-radius:0 14px 14px 0;padding:8px 14px;font-size:.83rem;color:var(--mut);margin-top:8px;background:rgba(var(--acc),.03);line-height:1.5}
 .warn b{color:var(--txt)}
+/* board notes dialog: full compatibility text opened from a library card */
+.notedlg{width:min(460px,calc(100vw - 32px));max-height:min(82vh,580px);margin:auto;padding:0;border:1px solid var(--edge);border-radius:var(--r);background-color:var(--panel);background-image:var(--cardbg);color:var(--txt);box-shadow:0 30px 80px -30px rgba(0,0,0,.85);overflow:hidden}
+.notedlg::backdrop{background:rgba(5,6,8,.58);backdrop-filter:blur(5px);-webkit-backdrop-filter:blur(5px)}
+.notedlg[open]{animation:notepop .18s ease-out}
+@keyframes notepop{from{opacity:0;transform:translateY(8px) scale(.985)}to{opacity:1;transform:none}}
+.notehead{display:flex;align-items:flex-start;gap:12px;padding:16px 16px 0}
+.notehead h3{margin:2px 0 0;font-size:.95rem;line-height:1.35;font-weight:600;min-width:0}
+.notekicker{display:block;font-family:var(--fpx);font-size:.52rem;letter-spacing:.1em;text-transform:uppercase;color:var(--faint);margin-bottom:3px}
+.notex{flex:none;margin-left:auto;width:30px;height:30px;border:var(--ctl-line);border-radius:var(--r-sm);background:transparent;color:var(--mut);cursor:pointer;font-size:.85rem;line-height:1}
+.notex:hover{color:var(--txt);border-color:var(--line2)}
+.notebody{padding:12px 16px 16px;display:grid;gap:10px;overflow:auto;max-height:calc(82vh - 100px)}
+.notebody p{margin:0;color:var(--mut);font-size:.84rem;line-height:1.6}
+.notebody .notestatus{display:flex;align-items:center;gap:7px;color:rgb(var(--alert));font-family:var(--fpx);font-size:.58rem;letter-spacing:.07em;text-transform:uppercase}
+.notebody .notestatus i{flex:none;width:6px;height:6px;border-radius:50%;background:rgb(var(--alert));box-shadow:0 0 7px rgba(var(--alert),.6)}
+.notebody .notewarn{color:var(--txt);border-left:2px solid rgba(var(--acc),.4);padding-left:11px}
+.notefoot{display:flex;justify-content:flex-end;padding:0 16px 16px}
+.notefoot button{height:34px;padding:0 16px;border:var(--ctl-line);border-radius:var(--r-ctl);background:transparent;color:var(--txt);font-family:var(--fpx);font-size:.58rem;letter-spacing:.06em;text-transform:uppercase;cursor:pointer}
+.notefoot button:hover{border-color:var(--line2)}
 /* custom-build notice: community images are not vendor releases */
 .buildnote{padding:18px 0}
 .buildnote .bwrap{position:relative;display:flex;align-items:flex-start;gap:14px;padding:15px 18px;background:color-mix(in srgb,var(--panel) 82%,transparent);border:1px solid rgba(var(--acc),.14);border-radius:var(--r);box-shadow:var(--cardsh);overflow:clip;backdrop-filter:blur(6px) saturate(1.15);-webkit-backdrop-filter:blur(6px) saturate(1.15)}
@@ -491,16 +509,23 @@ a.linebtn[aria-disabled="true"]{color:var(--faint);border-style:dashed;cursor:no
 .lthumb{aspect-ratio:16/9;background:#fff;border:1px solid color-mix(in srgb,var(--line2) 55%,transparent);border-radius:var(--r-in);overflow:hidden}
 .lthumb img{display:block;width:100%;height:100%;object-fit:cover;object-position:left center}
 .lthumb.empty{aspect-ratio:16/6;display:grid;place-items:center;background:var(--soft);color:var(--faint);font-family:var(--fpx);font-size:.52rem;line-height:1.5;letter-spacing:.05em;text-transform:uppercase;text-align:center;padding:10px}
-.lmeta{display:flex;align-items:center;gap:6px;flex-wrap:nowrap;overflow:hidden;min-width:0}
+.lmeta{display:flex;align-items:center;gap:6px;flex-wrap:wrap;overflow:visible;min-width:0}
 .lmeta .badge{margin-left:0;flex:none}
-.lstatus{display:flex;align-items:center;gap:7px;font-family:var(--fpx);font-size:.56rem;letter-spacing:.08em;text-transform:uppercase;color:var(--faint)}
-.lstatus i{flex:none;width:6px;height:6px;border-radius:50%;background:rgba(var(--acc),.9);box-shadow:0 0 8px rgba(var(--acc),.55)}
-.lwarn{font-size:.7rem;line-height:1.4;color:var(--mut);border-left:2px solid rgba(var(--acc),.45);background:rgba(var(--acc),.06);border-radius:0 6px 6px 0;padding:6px 8px}
-html[data-theme="light"] .lwarn{background:rgba(var(--acc),.07);color:var(--mut)}
+.lmeta .lstatus{margin-left:auto;font-size:.5rem;padding:2px 6px;gap:5px}
+.lstatus{display:inline-flex;align-self:flex-start;align-items:center;gap:6px;font-family:var(--fpx);font-size:.52rem;letter-spacing:.09em;text-transform:uppercase;color:rgb(var(--alert));background:rgba(var(--alert),.07);border:1px solid rgba(var(--alert),.28);border-radius:999px;padding:3px 8px;line-height:1;white-space:nowrap}
+.lstatus i{flex:none;width:5px;height:5px;border-radius:50%;background:rgb(var(--alert));box-shadow:0 0 7px rgba(var(--alert),.6)}
+.lnote{display:flex;align-items:center;gap:7px;min-height:30px;min-width:0;padding:4px 8px;border:var(--hair);border-radius:var(--r-sm);background:color-mix(in srgb,var(--txt) 2.5%,transparent);font-size:.66rem;line-height:1.25;color:var(--faint)}
+.lnote-i{flex:none;display:inline-grid;place-items:center;width:15px;height:15px;border:1px solid var(--line2);border-radius:50%;font-family:var(--fpx);font-size:.5rem;color:var(--faint)}
+.lnote.has-more{border-color:rgba(var(--acc),.18);background:rgba(var(--acc),.035);color:var(--mut)}
+.lnote.has-more .lnote-i{color:rgba(var(--acc),.95);border-color:rgba(var(--acc),.35)}
+.lnote-t{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.lmore{flex:none;margin-left:auto;padding:2px 0 2px 6px;border:0;background:none;color:rgba(var(--acc),.95);font-family:var(--fpx);font-size:.52rem;letter-spacing:.07em;text-transform:uppercase;cursor:pointer}
+.lmore:hover{text-decoration:underline;text-underline-offset:2px}
+html[data-theme="light"] .lnote.has-more{background:rgba(var(--acc),.04);border-color:rgba(var(--acc),.16)}
 .badge.warn{border-color:rgba(var(--acc),.55);color:rgba(var(--acc),.95);background:rgba(var(--acc),.1)}
 .lgroup{font-family:var(--fpx);font-size:.5rem;letter-spacing:.09em;text-transform:uppercase;color:var(--faint);border:var(--hair);border-radius:999px;padding:2px 7px}
 .lcard h3{margin:0;font-size:.84rem;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.lcard p{margin:0;color:var(--mut);font-size:.75rem;line-height:1.45;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.lcard p{margin:0;color:var(--mut);font-size:.75rem;line-height:1.45;min-height:calc(1.45em * 3);display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
 .lcard .lgo{margin-top:auto}
 .lcard .lgo button{width:100%;height:34px;font-size:.58rem}
 .lcard .lgo button:disabled{opacity:.55;cursor:not-allowed}
@@ -872,6 +897,15 @@ html[data-theme="light"] md-menu{--md-menu-container-color:#F0EFEB;--md-list-ite
 <div class="stage" id="stage"><img id="modalimg" src="" alt="" draggable="false"></div>
 <p class="hint">Scroll or drag the slider to zoom · drag to pan · double-click for 1:1 · Esc to close</p>
 </div>
+
+<dialog class="notedlg" id="notedlg" aria-labelledby="notetitle">
+<div class="notehead">
+<div><span class="notekicker">Board notes</span><h3 id="notetitle">Board</h3></div>
+<button type="button" class="notex" id="noteclose" aria-label="Close board notes">✕</button>
+</div>
+<div class="notebody" id="notebody"></div>
+<div class="notefoot"><button type="button" id="notedone">Got it</button></div>
+</dialog>
 
 <footer>
 <div class="fwrap">
@@ -1531,8 +1565,9 @@ function fwOff(f){ return (f&&typeof f.offset==='number'&&f.offset>0)?f.offset:0
 function renderLibrary(){
  if(!libgrid) return;
  libgrid.innerHTML=FIRMWARE.map(f=>{
-   return '<article class="lcard"><div class="lmeta"><span class="lgroup">'+esc(f.group)+'</span><span class="badge">'+esc(f.chip)+'</span>'+(fwOff(f)?'<span class="badge" title="App-only image, flashed at this offset"> '+hexAddr(fwOff(f))+'</span>':'')+'</div>'
-   +'<h3>'+esc(f.name)+'</h3>'+(f.untested?'<div class="lstatus" title="Nobody has verified this on real hardware yet — flash it, test it, and report back via the helper"><i></i>Untested build</div>':'')+'<p>'+esc(f.desc)+'</p>'+(f.warning?'<div class="lwarn">'+esc(f.warning)+'</div>':'')
+   return '<article class="lcard"><div class="lmeta"><span class="lgroup">'+esc(f.group)+'</span><span class="badge">'+esc(f.chip)+'</span>'+(fwOff(f)?'<span class="badge" title="App-only image, flashed at this offset"> '+hexAddr(fwOff(f))+'</span>':'')+(f.untested?'<span class="lstatus" title="Nobody has verified this on real hardware yet — flash it, test it, and report back via the helper"><i></i>Untested</span>':'')+'</div>'
+   +'<h3>'+esc(f.name)+'</h3><p>'+esc(f.desc)+'</p>'
+   +'<div class="lnote'+(f.warning?' has-more':'')+'"><span class="lnote-i" aria-hidden="true">'+(f.warning?'!':'&#10003;')+'</span><span class="lnote-t" title="'+esc(f.warning||'Standard flash — no extra compatibility notes.')+'">'+esc(f.warning?(f.note||'Compatibility notes'):'No special requirements')+'</span>'+(f.warning?'<button type="button" class="lmore" data-note="'+f.id+'" aria-label="Read full notes for '+esc(f.name)+'">More</button>':'')+'</div>'
    +'<div class="lgo"><button type="button" class="line" data-fw="'+f.id+'">'+(f.missing?'Bin not bundled':'Flash this board')+'</button></div></article>';
  }).join('');
  libgrid.querySelectorAll('button[data-fw]').forEach(b=>{
@@ -1546,6 +1581,32 @@ function renderLibrary(){
 const ccopy=document.getElementById('cmdcopy');
 if(ccopy) ccopy.onclick=async()=>{ const c=document.getElementById('clicmd'); if(!c) return; try{ await navigator.clipboard.writeText(c.textContent); ccopy.textContent='Copied'; }catch(e){ ccopy.textContent='Select + Ctrl+C'; } setTimeout(()=>{ccopy.textContent='Copy command';},1500); };
 renderLibrary();
+/* full notes open in a dialog so a long warning never stretches the card grid */
+let noteScroll='';
+function openNote(id){
+ const f=FIRMWARE.find(x=>x.id===id), dlg=document.getElementById('notedlg');
+ if(!f||!dlg) return;
+ document.getElementById('notetitle').textContent=f.name;
+ let h='';
+ if(f.untested) h+='<p class="notestatus"><i></i>Untested build, not verified on hardware yet</p>';
+ h+='<p class="notewarn">'+esc(f.warning||'Standard flash — no extra compatibility notes.')+'</p>';
+ document.getElementById('notebody').innerHTML=h;
+ if(!dlg.open){ noteScroll=document.body.style.overflow; document.body.style.overflow='hidden'; }
+ if(typeof dlg.showModal==='function'){ if(!dlg.open) dlg.showModal(); } else { dlg.setAttribute('open',''); }
+}
+if(libgrid) libgrid.addEventListener('click',e=>{ const b=e.target.closest('button[data-note]'); if(b) openNote(b.getAttribute('data-note')); });
+const notedlg=document.getElementById('notedlg');
+if(notedlg){
+ const noteClose=()=>{ try{ notedlg.close(); }catch(e){ notedlg.removeAttribute('open'); document.body.style.overflow=noteScroll; noteScroll=''; } };
+ notedlg.addEventListener('close',()=>{ document.body.style.overflow=noteScroll; noteScroll=''; });
+ document.getElementById('noteclose').onclick=noteClose;
+ document.getElementById('notedone').onclick=noteClose;
+ notedlg.addEventListener('click',e=>{
+  if(e.target!==notedlg) return;
+  const r=notedlg.getBoundingClientRect();
+  if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom) noteClose();
+ });
+}
 heroSpec();
 function setT(on,msg){try{if(tdot)tdot.classList.toggle('on',!!on);if(tstatus&&msg)tstatus.textContent=msg;}catch(e){}}
 if(tcopy)tcopy.onclick=async()=>{try{await navigator.clipboard.writeText(con.textContent);tcopy.classList.add('ok');setTimeout(()=>tcopy.classList.remove('ok'),1200);}catch(e){const o=tcopy.title;tcopy.title='Select text + Ctrl+C';setTimeout(()=>tcopy.title=o,1500);}};
