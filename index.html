@@ -30,7 +30,7 @@
 <title>ESP Firmware Flasher — Bruce, Marauder & Flipper, no install</title>
 <script type="module" src="https://unpkg.com/esp-web-tools@10/dist/web/install-button.js?module"></script>
 <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-<script src="boards.js?v=19"></script>
+<script src="boards.js?v=20"></script>
 <style>
 @font-face{font-family:'Departure Mono';font-style:normal;font-weight:400;font-display:swap;src:url(fonts/departure-mono-400.woff2) format('woff2')}
 @font-face{font-family:'JetBrains Mono';font-style:normal;font-weight:400;font-display:swap;src:url(fonts/jetbrains-mono-400-latin-ext.woff2) format('woff2');unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF}
@@ -377,18 +377,16 @@ code{font-family:var(--fmono);background:var(--codebg);color:var(--codetxt);padd
 .warn{border:1px solid rgba(255,255,255,.05);border-left:2px solid rgba(var(--acc),.4);border-radius:0 14px 14px 0;padding:8px 14px;font-size:.83rem;color:var(--mut);margin-top:8px;background:rgba(var(--acc),.03);line-height:1.5}
 .warn b{color:var(--txt)}
 /* custom-build notice: community images are not vendor releases */
-.buildnote{border-top:var(--hair);border-bottom:var(--hair);background:linear-gradient(90deg,rgba(217,119,6,.09),rgba(217,119,6,.02) 52%,transparent)}
-.buildnote .bwrap{display:flex;align-items:flex-start;gap:14px;padding:17px 0}
-.buildnote .bnicon{flex:none;display:grid;place-items:center;width:30px;height:30px;border:1px solid rgba(217,119,6,.45);border-radius:50%;background:rgba(217,119,6,.1);color:#f59e0b;font-family:var(--fpx);font-size:.85rem;line-height:1}
+.buildnote{padding:18px 0}
+.buildnote .bwrap{position:relative;display:flex;align-items:flex-start;gap:14px;padding:15px 18px;background:color-mix(in srgb,var(--panel) 82%,transparent);border:1px solid rgba(var(--acc),.14);border-radius:var(--r);box-shadow:var(--cardsh);overflow:clip;backdrop-filter:blur(6px) saturate(1.15);-webkit-backdrop-filter:blur(6px) saturate(1.15)}
+.buildnote .bnicon{flex:none;display:grid;place-items:center;width:30px;height:30px;border:1px solid rgba(var(--acc),.35);border-radius:50%;background:rgba(var(--acc),.07);color:rgba(var(--acc),.95);font-family:var(--fpx);font-size:.85rem;line-height:1}
 .buildnote .bntext{flex:1 1 auto;min-width:0}
 .buildnote b{display:block;margin:0 0 4px;font-family:var(--fpx);font-weight:400;font-size:.66rem;letter-spacing:.06em;text-transform:uppercase;color:var(--txt)}
 .buildnote p{margin:0;color:var(--mut);font-size:.83rem;line-height:1.6;max-width:110ch}
 .buildnote p a{color:var(--txt)}
-.buildnote>a,.buildnote .bwrap>a{flex:none;align-self:center;display:inline-flex;align-items:center;height:34px;padding:0 13px;border:1px solid rgba(217,119,6,.4);border-radius:var(--r-ctl);background:rgba(217,119,6,.08);color:var(--txt);font-family:var(--fpx);font-size:.6rem;letter-spacing:.04em;text-decoration:none;white-space:nowrap;transition:border-color .18s,background .18s}
-.buildnote>a:hover,.buildnote .bwrap>a:hover{border-color:rgba(217,119,6,.75);background:rgba(217,119,6,.14)}
-html[data-theme="light"] .buildnote{background:linear-gradient(90deg,rgba(180,83,9,.1),rgba(180,83,9,.025) 52%,transparent)}
-html[data-theme="light"] .buildnote .bnicon{color:#b45309}
-@media(max-width:760px){.buildnote .bwrap{flex-wrap:wrap;padding:15px 0}.buildnote .bwrap>a{margin-left:44px}.buildnote p{font-size:.8rem}}
+.buildnote>a,.buildnote .bwrap>a{flex:none;align-self:center;display:inline-flex;align-items:center;height:34px;padding:0 13px;border:1px solid rgba(var(--acc),.3);border-radius:var(--r-ctl);background:rgba(var(--acc),.05);color:var(--txt);font-family:var(--fpx);font-size:.6rem;letter-spacing:.04em;text-decoration:none;white-space:nowrap;transition:border-color .18s,background .18s}
+.buildnote>a:hover,.buildnote .bwrap>a:hover{border-color:rgba(var(--acc),.55);background:rgba(var(--acc),.1)}
+@media(max-width:760px){.buildnote{padding:14px 0}.buildnote .bwrap{flex-wrap:wrap;padding:14px}.buildnote .bwrap>a{margin-left:44px}.buildnote p{font-size:.8rem}}
 /* feedback cards: bug, idea, build */
 .fbgrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
 .fbcard{position:relative;display:flex;flex-direction:column;gap:9px;min-height:158px;padding:18px;background:var(--cardbg);border:var(--cardline);border-radius:var(--r);box-shadow:var(--cardsh);color:var(--txt);text-decoration:none;transition:border-color .2s,box-shadow .25s,transform .2s}
@@ -496,10 +494,10 @@ a.linebtn[aria-disabled="true"]{color:var(--faint);border-style:dashed;cursor:no
 .lmeta{display:flex;align-items:center;gap:6px;flex-wrap:nowrap;overflow:hidden;min-width:0}
 .lmeta .badge{margin-left:0;flex:none}
 .lstatus{display:flex;align-items:center;gap:7px;font-family:var(--fpx);font-size:.56rem;letter-spacing:.08em;text-transform:uppercase;color:var(--faint)}
-.lstatus i{flex:none;width:6px;height:6px;border-radius:50%;background:#f59e0b;box-shadow:0 0 8px rgba(245,158,11,.8)}
-.lwarn{font-size:.7rem;line-height:1.4;color:var(--mut);border-left:2px solid rgba(217,119,6,.6);background:rgba(217,119,6,.08);border-radius:0 6px 6px 0;padding:6px 8px}
-html[data-theme="light"] .lwarn{background:rgba(217,119,6,.06);color:#7c4a03}
-.badge.warn{border-color:rgba(217,119,6,.55);color:#f59e0b;background:rgba(217,119,6,.1)}
+.lstatus i{flex:none;width:6px;height:6px;border-radius:50%;background:rgba(var(--acc),.9);box-shadow:0 0 8px rgba(var(--acc),.55)}
+.lwarn{font-size:.7rem;line-height:1.4;color:var(--mut);border-left:2px solid rgba(var(--acc),.45);background:rgba(var(--acc),.06);border-radius:0 6px 6px 0;padding:6px 8px}
+html[data-theme="light"] .lwarn{background:rgba(var(--acc),.07);color:var(--mut)}
+.badge.warn{border-color:rgba(var(--acc),.55);color:rgba(var(--acc),.95);background:rgba(var(--acc),.1)}
 .lgroup{font-family:var(--fpx);font-size:.5rem;letter-spacing:.09em;text-transform:uppercase;color:var(--faint);border:var(--hair);border-radius:999px;padding:2px 7px}
 .lcard h3{margin:0;font-size:.84rem;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .lcard p{margin:0;color:var(--mut);font-size:.75rem;line-height:1.45;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
@@ -675,7 +673,7 @@ html[data-theme="light"] md-menu{--md-menu-container-color:#F0EFEB;--md-list-ite
 <span class="bnicon" aria-hidden="true">!</span>
 <div class="bntext">
 <b id="buildnote-title">Community builds &mdash; test before you trust them</b>
-<p>Every image here is built and shared by the community, not by the board vendors. Not every board and radio combination has been tested on real hardware. Check your wiring, use a stable 5&nbsp;V supply, and treat the first boot as a bench test. If something fails, <a href="#feedback">send the serial log</a> &mdash; that is how a build gets fixed.</p>
+<p>Every image here is built and shared by the community, not by the board vendors. Not every board and radio combination has been tested on real hardware. Check your wiring, use one power source only (USB 5&nbsp;V, the 5&nbsp;V pin, or a regulated 3.3&nbsp;V supply on 3V3 &mdash; never 5&nbsp;V on 3V3), and treat the first boot as a bench test. If something fails, <a href="#feedback">send the serial log</a> &mdash; that is how a build gets fixed.</p>
 </div>
 <a href="#feedback">Report a result</a>
 </div>
@@ -798,7 +796,7 @@ html[data-theme="light"] md-menu{--md-menu-container-color:#F0EFEB;--md-list-ite
 <details><summary>No port appears in the picker</summary><div>Hold <b>BOOT</b>, tap <b>RST</b>, release <b>BOOT</b>, then press Flash again. Boards without a USB-serial chip also need a data-capable cable — charge-only cables are the most common cause.</div></details>
 <details><summary>The port is busy</summary><div>One application owns a serial port at a time. Close the terminal on this page first, and close any other serial monitor or IDE that may be holding the port, then reconnect.</div></details>
 <details><summary>The flash failed part-way</summary><div>Reconnect at a lower baud rate, use a powered USB port rather than an unpowered hub, and make sure the image matches its offset — every prebuilt here is merged at <code>0x0000</code> (custom split files use Your .bin + Add part).</div></details>
-<details><summary>Flash succeeds but the screen stays black</summary><div>Check the wiring guide — wrong display pins give a lit-but-blank screen even when the firmware boots fine. On 16MB quad-SPI S3 modules a QIO 80MHz header watchdog-loops at boot — the S3 image here is already patched to DIO 40MHz, which the SHA-256 row reflects.</div></details>
+<details><summary>Flash succeeds but the screen stays black</summary><div>Check the wiring guide — wrong display pins give a lit-but-blank screen even when the firmware boots fine. Some 16MB S3 modules are picky about flash mode and speed: the Marauder 16MB cards use DIO 40MHz for that reason. If a build bootloops, report the 115200 boot log and the exact card you used.</div></details>
 <details><summary>Screen works but touch does nothing</summary><div>You probably flashed the build for the other panel controller. ST7789 and ILI9341 are not interchangeable: the wrong image can still light the screen because their init commands overlap, but the touch calibration is different, so taps miss or do nothing. Pick the card that matches the panel printed on your board, then flash again at <b>0x0000</b> with Erase. Display CS and touch CS are separate, so the shared MOSI/MISO/SCK bus is not the problem.</div></details>
 <details><summary>The browser says Web Serial is unsupported</summary><div>Web Serial needs a desktop Chromium browser — Chrome or Edge 89 and newer. Firefox, Safari and most mobile browsers do not implement it yet.</div></details>
 </div>
@@ -1910,7 +1908,7 @@ try{
   {l:'Boot log',k:['boot','log','terminal','115200','blank','loop','verify'],t:'After flashing: open Terminal below, Connect at <b>115200</b>, tap RST. No output? Swap cable, check wiring, then re-flash with Erase first.'},
   {l:'File safety',k:['own bin','custom','my bin','upload','esptool'],t:'Your .bin never leaves your machine — it becomes a local blob URL and streams over USB. Chip + offset are auto-detected from the header. Manual equivalent is shown under Flash.'},
   {l:'Unbrick',k:['erase','brick','restore','stock'],t:'Changed partition layout or boot loop? Re-open FLASH and tick Erase, flash the merged image at 0x0000 again, then check the boot log.'},
-  {l:'Untested builds',k:['untested'],t:'Two community boards are awaiting their first hardware test — type <b>untested</b> for the live list, or see the Untested build strips on their library cards.'},
+  {l:'Untested builds',k:['untested'],t:'Some community builds are awaiting their first hardware test — type <b>untested</b> for the live list, or see the Untested build strips on their library cards.'},
   {l:'Report issue',k:['issue','report','bug','github','problem','ticket','email','mail','contact','author'],t:'Found a bug? Tap <b>🐛 Report an issue</b> below — describe it, hit Open in GitHub, and the issue opens prefilled on <b>'+REPO_SLUG+'</b>. Nothing is filed until you press Submit there.'},
  ];
  const QUICK=['No port?','Port busy?','Flash failed','All topics','Report issue'];
@@ -1935,7 +1933,7 @@ try{
   for(const r of RULES){ for(const k of r.k){ if(s.indexOf(k)>=0) return r; } }
   return null;
  }
- function untestedText(){ try{ const u=FIRMWARE.filter(f=>f.untested); if(!u.length) return 'Every board here is tested on real hardware — nothing untested right now.'; return 'Marked untested (nobody has verified them on hardware yet):<br>'+u.map(f=>'<b>'+esc(f.name)+'</b> ('+esc(f.chip)+')').join('<br>')+'<br>Flashing works the same. Got the hardware? Please test and tap <b>🐛 Report an issue</b> with your results — good reports promote a board to tested.'; }catch(e){ return 'Two community boards are awaiting their first test — see the library cards marked Untested build.'; } }
+ function untestedText(){ try{ const u=FIRMWARE.filter(f=>f.untested); if(!u.length) return 'Every board here is tested on real hardware — nothing untested right now.'; return 'Marked untested (nobody has verified them on hardware yet):<br>'+u.map(f=>'<b>'+esc(f.name)+'</b> ('+esc(f.chip)+')').join('<br>')+'<br>Flashing works the same. Got the hardware? Please test and tap <b>🐛 Report an issue</b> with your results — good reports promote a board to tested.'; }catch(e){ return 'Some community builds are awaiting their first test — see the library cards marked Untested build.'; } }
  function answer(q){
   const qs=String(q||'').toLowerCase();
   if(/untested|not tested|untried|experimental/.test(qs)) return untestedText();

@@ -98,11 +98,10 @@ The touchscreen shares the SPI bus (MOSI/MISO/SCK) with the display but has sepa
 
 ## Power Supply
 
-- **Logic voltage**: 3.3V
-- **Supply current**: ~600mA typical (display + touch + MCU)
-- **Peak current**: ~1000mA (during radio transmission + backlight at full brightness)
-
-Use a quality USB power supply or regulated 3.3V source rated for at least 1.5A.
+- **ESP32-WROOM-32 module supply**: 3.0–3.6 V, 3.3 V typical. The module is not a 5 V part.
+- **Board input**: 5 V USB or the 5 V pin, regulated down to 3.3 V on the board. The 3V3 pin takes a regulated 3.3 V supply only.
+- **Power options**: use one source only — USB, the 5 V pin, or the 3V3 pin. Never feed 5 V into 3V3.
+- **Current budget**: the ESP32-WROOM-32 datasheet specifies a 0.5 A supply minimum. With the display, touch and radio, use a 5 V USB source rated for at least 1 A.
 
 ## SPI Bus Architecture
 

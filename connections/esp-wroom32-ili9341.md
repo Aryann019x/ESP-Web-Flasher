@@ -75,13 +75,17 @@ All buttons are **active-LOW** (GND when pressed).
 
 ## Power Supply
 
-- **Logic voltage**: 3.3V
-- **Supply current**: ~500mA typical (display + MCU)
-- **Peak current**: ~800mA (during radio transmission)
+- **ESP32-WROOM-32 module supply**: 3.0&ndash;3.6&nbsp;V, 3.3&nbsp;V typical. The module is not a 5&nbsp;V part.
+- **Board input**: 5&nbsp;V USB or the 5&nbsp;V pin, regulated down to 3.3&nbsp;V on the board. The 3V3 pin takes a regulated 3.3&nbsp;V supply only.
+- **Power options**: use one source only &mdash; USB, the 5&nbsp;V pin, or the 3V3 pin. Never feed 5&nbsp;V into 3V3.
+- **Current budget for this build**: the ESP32-WROOM-32 datasheet specifies a 0.5&nbsp;A supply minimum. With the display and radio, budget for peaks around 800&nbsp;mA and use a 5&nbsp;V USB source rated for at least 1&nbsp;A.
 
-Use a quality USB power supply or regulated 3.3V source rated for at least 1A.
+Espressif references:
 
-> **WiFi / AP brownout warning:** starting an access point, Evil Portal or a WiFi attack adds short current spikes. Weak USB ports, long or thin cables, and unpowered hubs can drop the 3.3V rail far enough to reset the board mid-boot. Use a 5V 1A+ supply, keep the USB cable short, and add a 470-1000 uF electrolytic capacitor plus a 100 nF ceramic capacitor across 3.3V/GND if it still resets. A 100 uF capacitor near the radio module also helps. This build caps WiFi TX power at 13 dBm, but the power path still has to be able to deliver the peak current.
+- [ESP32-DevKitC V4 user guide](https://docs.espressif.com/projects/esp-dev-kits/en/latest/esp32/esp32-devkitc/user_guide.html)
+- [ESP32-WROOM-32 datasheet](https://documentation.espressif.com/esp32-wroom-32_datasheet_en.pdf)
+
+> **WiFi / AP brownout warning:** starting an access point, Evil Portal or a WiFi attack adds short current spikes. Weak USB ports, long or thin cables, and unpowered hubs can drop the 3.3V rail far enough to reset the board mid-boot. Use a 5&nbsp;V USB source rated for at least 1&nbsp;A, keep the USB cable short, and add a 470-1000 uF electrolytic capacitor plus a 100 nF ceramic capacitor across 3.3V/GND if it still resets. A 100 uF capacitor near the radio module also helps. This build caps WiFi TX power at 13 dBm, but the power path still has to be able to deliver the peak current.
 
 ## Wiring Notes
 
