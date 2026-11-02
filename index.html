@@ -30,7 +30,7 @@
 <title>ESP Firmware Flasher — Bruce, Marauder & Flipper, no install</title>
 <script type="module" src="https://unpkg.com/esp-web-tools@10/dist/web/install-button.js?module"></script>
 <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-<script src="boards.js?v=18"></script>
+<script src="boards.js?v=19"></script>
 <style>
 @font-face{font-family:'Departure Mono';font-style:normal;font-weight:400;font-display:swap;src:url(fonts/departure-mono-400.woff2) format('woff2')}
 @font-face{font-family:'JetBrains Mono';font-style:normal;font-weight:400;font-display:swap;src:url(fonts/jetbrains-mono-400-latin-ext.woff2) format('woff2');unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF}
@@ -376,6 +376,33 @@ details[open] summary:hover::after{color:var(--txt);border-color:rgba(var(--acc)
 code{font-family:var(--fmono);background:var(--codebg);color:var(--codetxt);padding:2px 6px;border-radius:var(--r-sm);font-size:.85em}
 .warn{border:1px solid rgba(255,255,255,.05);border-left:2px solid rgba(var(--acc),.4);border-radius:0 14px 14px 0;padding:8px 14px;font-size:.83rem;color:var(--mut);margin-top:8px;background:rgba(var(--acc),.03);line-height:1.5}
 .warn b{color:var(--txt)}
+/* custom-build notice: community images are not vendor releases */
+.buildnote{border-top:var(--hair);border-bottom:var(--hair);background:linear-gradient(90deg,rgba(217,119,6,.09),rgba(217,119,6,.02) 52%,transparent)}
+.buildnote .bwrap{display:flex;align-items:flex-start;gap:14px;padding:17px 0}
+.buildnote .bnicon{flex:none;display:grid;place-items:center;width:30px;height:30px;border:1px solid rgba(217,119,6,.45);border-radius:50%;background:rgba(217,119,6,.1);color:#f59e0b;font-family:var(--fpx);font-size:.85rem;line-height:1}
+.buildnote .bntext{flex:1 1 auto;min-width:0}
+.buildnote b{display:block;margin:0 0 4px;font-family:var(--fpx);font-weight:400;font-size:.66rem;letter-spacing:.06em;text-transform:uppercase;color:var(--txt)}
+.buildnote p{margin:0;color:var(--mut);font-size:.83rem;line-height:1.6;max-width:110ch}
+.buildnote p a{color:var(--txt)}
+.buildnote>a,.buildnote .bwrap>a{flex:none;align-self:center;display:inline-flex;align-items:center;height:34px;padding:0 13px;border:1px solid rgba(217,119,6,.4);border-radius:var(--r-ctl);background:rgba(217,119,6,.08);color:var(--txt);font-family:var(--fpx);font-size:.6rem;letter-spacing:.04em;text-decoration:none;white-space:nowrap;transition:border-color .18s,background .18s}
+.buildnote>a:hover,.buildnote .bwrap>a:hover{border-color:rgba(217,119,6,.75);background:rgba(217,119,6,.14)}
+html[data-theme="light"] .buildnote{background:linear-gradient(90deg,rgba(180,83,9,.1),rgba(180,83,9,.025) 52%,transparent)}
+html[data-theme="light"] .buildnote .bnicon{color:#b45309}
+@media(max-width:760px){.buildnote .bwrap{flex-wrap:wrap;padding:15px 0}.buildnote .bwrap>a{margin-left:44px}.buildnote p{font-size:.8rem}}
+/* feedback cards: bug, idea, build */
+.fbgrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.fbcard{position:relative;display:flex;flex-direction:column;gap:9px;min-height:158px;padding:18px;background:var(--cardbg);border:var(--cardline);border-radius:var(--r);box-shadow:var(--cardsh);color:var(--txt);text-decoration:none;transition:border-color .2s,box-shadow .25s,transform .2s}
+.fbcard:hover{border-color:rgba(var(--acc),.3);box-shadow:var(--cardsh-h);transform:translateY(-1px)}
+.fbcard .fbi{display:grid;place-items:center;width:32px;height:32px;border:1px solid rgba(var(--acc),.3);border-radius:var(--r-sm);background:rgba(var(--acc),.06);font-size:.95rem;line-height:1}
+.fbcard h3{margin:0;font-family:var(--fpx);font-weight:400;font-size:.7rem;letter-spacing:.05em;text-transform:uppercase;color:var(--txt)}
+.fbcard p{margin:0;color:var(--mut);font-size:.86rem;line-height:1.6;flex:1}
+.fbcard .fbgo{display:inline-flex;align-items:center;gap:7px;font-family:var(--fpx);font-size:.6rem;letter-spacing:.04em;color:rgba(var(--acc),.9)}
+.fbcard:hover .fbgo{color:var(--txt)}
+.fbcard .fbgo::after{content:"→";font-family:var(--fui);font-size:.9rem;line-height:1}
+@media(max-width:900px){.fbgrid{grid-template-columns:1fr}.fbcard{min-height:0}}
+.gfallback{margin:10px 0 0;font-size:.78rem;color:var(--faint)}
+.gfallback a{color:var(--mut);text-decoration:none;border-bottom:1px solid rgba(var(--acc),.35)}
+.gfallback a:hover{color:var(--txt)}
 /* footer: a spec sheet rather than a tagline - brand block, link columns, meta strip */
 footer{margin-top:22px;border-top:var(--hair);background:linear-gradient(180deg,rgba(var(--acc),.035),transparent 58%)}
 .fwrap{width:min(1800px,94%);margin:0 auto;display:grid;grid-template-columns:minmax(0,1.45fr) repeat(3,minmax(0,1fr));gap:20px 26px;padding:24px 0 20px;text-align:left}
@@ -643,6 +670,17 @@ html[data-theme="light"] md-menu{--md-menu-container-color:#F0EFEB;--md-list-ite
 </div>
 </section>
 
+<section class="buildnote" aria-labelledby="buildnote-title">
+<div class="bwrap">
+<span class="bnicon" aria-hidden="true">!</span>
+<div class="bntext">
+<b id="buildnote-title">Community builds &mdash; test before you trust them</b>
+<p>Every image here is built and shared by the community, not by the board vendors. Not every board and radio combination has been tested on real hardware. Check your wiring, use a stable 5&nbsp;V supply, and treat the first boot as a bench test. If something fails, <a href="#feedback">send the serial log</a> &mdash; that is how a build gets fixed.</p>
+</div>
+<a href="#feedback">Report a result</a>
+</div>
+</section>
+
 <section class="band-h" id="workstation">
 <div class="bwrap">
 <header class="bhead">
@@ -767,13 +805,43 @@ html[data-theme="light"] md-menu{--md-menu-container-color:#F0EFEB;--md-list-ite
 </div>
 </section>
 
-<section class="band-h" id="discussion" hidden>
+<section class="band-h" id="feedback">
+<div class="bwrap">
+<header class="bhead">
+<h2 class="sec">Feedback &amp; builds</h2>
+<p>Bugs, board requests and custom builds all shape what gets tested next. The first two open a prefilled report you can review before posting; the third takes you to the discussion below.</p>
+</header>
+<div class="fbgrid">
+<a class="fbcard" href="https://github.com/Aryann019x/ESP-Web-Flasher/issues/new" data-report="bug" target="_blank" rel="noopener">
+<span class="fbi" aria-hidden="true">🐞</span>
+<h3>Something broke</h3>
+<p>Flash failed, boot loop, dead screen, or a board that misbehaves. Include the board, what you clicked and the serial log.</p>
+<span class="fbgo">Report a bug</span>
+</a>
+<a class="fbcard" href="https://github.com/Aryann019x/ESP-Web-Flasher/issues/new" data-report="idea" target="_blank" rel="noopener">
+<span class="fbi" aria-hidden="true">💡</span>
+<h3>Have an idea</h3>
+<p>A board we should add, a guide that needs fixing, or a feature for the flasher. Tell us what would make it easier.</p>
+<span class="fbgo">Send a suggestion</span>
+</a>
+<a class="fbcard" href="#discussion">
+<span class="fbi" aria-hidden="true">🔧</span>
+<h3>Show your build</h3>
+<p>Custom wiring, a case, or a board that works. Post photos and pin notes in the discussion so the next builder can copy it.</p>
+<span class="fbgo">Open the discussion</span>
+</a>
+</div>
+</div>
+</section>
+
+<section class="band-h alt" id="discussion" hidden>
 <div class="bwrap">
 <header class="bhead">
 <h2 class="sec">Discussion</h2>
 <p>Flashed a build? Comment here with your board and result — good reports promote untested builds to tested. Questions and board requests welcome, sign in with GitHub to join in.</p>
 </header>
 <div class="giscus" id="giscus"></div>
+<p class="gfallback">Comments not loading? <a href="https://github.com/Aryann019x/ESP-Web-Flasher/discussions" target="_blank" rel="noopener">Open the discussion on GitHub</a>.</p>
 </div>
 </section>
 
@@ -820,11 +888,14 @@ html[data-theme="light"] md-menu{--md-menu-container-color:#F0EFEB;--md-list-ite
 <a href="#terminal">Serial terminal</a>
 <a href="#how">Getting started</a>
 <a href="#help">Troubleshooting</a>
+<a href="#feedback">Feedback &amp; builds</a>
 </div>
 <div class="fcol">
 <span class="flab">Resources</span>
 
 <a href="https://esphome.github.io/esp-web-tools/">ESP Web Tools</a>
+<a href="https://github.com/Aryann019x/ESP-Web-Flasher/issues/new" target="_blank" rel="noopener">Report an issue</a>
+<a href="https://github.com/Aryann019x/ESP-Web-Flasher/discussions" target="_blank" rel="noopener">Discussions</a>
 <a href="LICENSE">MIT License</a>
 </div>
 <div class="fcol">
@@ -866,6 +937,11 @@ const GISCUS={
   inputPosition:'bottom',
   lang:'en'
 };
+const giscusTheme=()=>document.documentElement.getAttribute('data-theme')==='light'?'light':'dark';
+function giscusSync(){
+  const f=document.querySelector('iframe.giscus-frame');
+  if(f&&f.contentWindow) f.contentWindow.postMessage({giscus:{setConfig:{theme:giscusTheme()}}},'https://giscus.app');
+}
 (function(){
   const sec=document.getElementById('discussion');
   if(!sec||!GISCUS.category||!GISCUS.categoryId) return; /* unconfigured: stay hidden */
@@ -881,15 +957,17 @@ const GISCUS={
       'data-mapping':GISCUS.mapping,'data-strict':'0',
       'data-reactions-enabled':GISCUS.reactions,'data-emit-metadata':'0',
       'data-input-position':GISCUS.inputPosition,
-      'data-theme':'preferred_color_scheme','data-lang':GISCUS.lang,'data-loading':'lazy'};
+      'data-theme':giscusTheme(),'data-lang':GISCUS.lang,'data-loading':'lazy'};
     for(const k in d) s.setAttribute(k,d[k]);
     host.appendChild(s);
+    try{ new MutationObserver(giscusSync).observe(host,{childList:true,subtree:true}); }catch(e){}
   }
   try{
     /* load only once the reader actually reaches the band */
     const io=new IntersectionObserver(es=>{ if(es.some(e=>e.isIntersecting)){ load(); io.disconnect(); } },{rootMargin:'300px'});
     io.observe(sec);
   }catch(e){ load(); }
+  try{ new MutationObserver(giscusSync).observe(document.documentElement,{attributes:true,attributeFilter:['data-theme']}); }catch(e){}
 })();
 const gsel=document.getElementById('group'), bsel=document.getElementById('board');
 const detail=document.getElementById('detail');
@@ -1795,8 +1873,8 @@ try{
   let board='';
   try{
    const g=document.getElementById('group'), b=document.getElementById('board');
-   const gt=g&&g.options[g.selectedIndex]?g.options[g.selectedIndex].text:'';
-   const bt=b&&b.options[b.selectedIndex]?b.options[b.selectedIndex].text:'';
+   const gt=g&&g.value&&g.options[g.selectedIndex]?g.options[g.selectedIndex].text:'';
+   const bt=b&&b.value&&b.options[b.selectedIndex]?b.options[b.selectedIndex].text:'';
    if(gt||bt) board=gt+(bt?' / '+bt:'');
   }catch(e){}
   return board;
@@ -1813,8 +1891,8 @@ try{
  function issueOpen(){
   const ti=document.getElementById('issuetitle'), bi=document.getElementById('issuebody');
   const title=((ti&&ti.value)||'').trim()||lastQ||'Web flasher issue';
-  const desc=((bi&&bi.value)||'').trim()||'(describe what happens, board, screenshot)';
-  const body='**Board:** '+(boardName()||'-')+'\n\n**What happened:**\n'+desc+'\n\n_reported from the ESP Firmware Flasher helper_';
+  const typed=((bi&&bi.value)||'').trim();
+  const body=typed||('**Board / firmware:** '+(boardName()||'-')+'\n\n**What happened:**\n(describe what happens, board, screenshot)\n\n_reported from the ESP Firmware Flasher helper_');
   const url='https://github.com/'+REPO_SLUG+'/issues/new?title='+encodeURIComponent(title)+'&body='+encodeURIComponent(body);
   try{ window.open(url,'_blank','noopener'); }catch(e){ location.href=url; }
  }
@@ -1873,12 +1951,32 @@ try{
   const r=ruleFor(q);
   return r?(r.l||'other'):'other';
  }
+ function prefillReport(kind){
+  const ti=document.getElementById('issuetitle'), bi=document.getElementById('issuebody');
+  if(!ti||!bi) return;
+  const board=boardName()||'-';
+  if(kind==='idea'){
+   ti.value='Suggestion: ';
+   bi.value='**Board / firmware:** '+board+'\n\n**What would help:**\n';
+  }else if(kind==='build'){
+   ti.value='Build: ';
+   bi.value='**Board / firmware:** '+board+'\n\n**What works / what changed:**\n\n**Photos or links:**\n';
+  }else{
+   ti.value='Bug: ';
+   bi.value='**Board / firmware:** '+board+'\n\n**What happened:**\n\n**Steps to reproduce:**\n1. \n\n**Serial log (115200):**\n```\n\n```\n';
+  }
+ }
+ function openReport(kind){
+  if(!panel.classList.contains('open')) openBot();
+  prefillReport(kind||'bug');
+  issueShow();
+ }
  let greeted=false;
  function openBot(){
   panel.classList.add('open'); panel.setAttribute('aria-hidden','false');
   fab.setAttribute('aria-expanded','true'); fab.textContent='×';
   if(!greeted){ greeted=true; say('bot','Hey! I can walk you through flashing. What is stuck — port, wiring, or the flash itself?'); }
-  try{ setTimeout(()=>input.focus(),60); }catch(e){}
+  try{ setTimeout(()=>{ const ip=document.getElementById('botissue-pop'); if(!ip||ip.hidden) input.focus(); },60); }catch(e){}
  }
   function closeBot(){
    try{ if(document.getElementById('botinfo-pop')) document.getElementById('botinfo-pop').hidden=true; }catch(e){}
@@ -1903,7 +2001,7 @@ try{
  if(infoBtn) infoBtn.onclick=(e)=>{ e.stopPropagation(); issueHide(); infoToggle(); };
  if(infoOk) infoOk.onclick=()=>{ infoHide(); try{ input.focus(); }catch(e){} };
  document.addEventListener('click',e=>{ if(infoPop&&!infoPop.hidden&&panel.classList.contains('open')&&!panel.contains(e.target)) infoHide(); });
- document.addEventListener('click',e=>{ const ip=document.getElementById('botissue-pop'); if(ip&&!ip.hidden&&panel.classList.contains('open')&&!panel.contains(e.target)) issueHide(); });
+ document.addEventListener('click',e=>{ const ip=document.getElementById('botissue-pop'); if(ip&&!ip.hidden&&panel.classList.contains('open')&&!panel.contains(e.target)&&!e.target.closest('#botfab,[data-report]')) issueHide(); });
  document.addEventListener('keydown',e=>{ if(e.key!=='Escape'||!panel.classList.contains('open')) return; const ip=document.getElementById('botissue-pop'); if(ip&&!ip.hidden){ issueHide(); return; } if(infoPop&&!infoPop.hidden){ infoHide(); return; } closeBot(); });
  chips.innerHTML=QUICK.map(q=>'<button type="button">'+q+'</button>').join('');
  chips.querySelectorAll('button').forEach(b=>{ b.onclick=()=>{ const t=b.textContent; if(/report|issue/i.test(t)){ lastQ=input.value||lastQ; issueShow(); return; } if(/all topics/i.test(t)){ showTopics(); return; } say('me',t); lastQ=t; say('bot',answer(t),answerLabel(t)); }; });
@@ -1926,6 +2024,9 @@ try{
  if(issueCancel) issueCancel.onclick=()=>{ issueHide(); try{ input.focus(); }catch(e){} };
  if(issueGo) issueGo.onclick=()=>{ issueOpen(); };
  input.addEventListener('keydown',e=>{ if(e.key==='Enter'){ e.preventDefault(); submit(); } });
+ document.querySelectorAll('[data-report]').forEach(el=>{
+  el.addEventListener('click',e=>{ e.preventDefault(); openReport(el.getAttribute('data-report')); });
+ });
 })();
 </script>
 </body>

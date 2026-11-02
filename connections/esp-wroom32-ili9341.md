@@ -81,6 +81,8 @@ All buttons are **active-LOW** (GND when pressed).
 
 Use a quality USB power supply or regulated 3.3V source rated for at least 1A.
 
+> **WiFi / AP brownout warning:** starting an access point, Evil Portal or a WiFi attack adds short current spikes. Weak USB ports, long or thin cables, and unpowered hubs can drop the 3.3V rail far enough to reset the board mid-boot. Use a 5V 1A+ supply, keep the USB cable short, and add a 470-1000 uF electrolytic capacitor plus a 100 nF ceramic capacitor across 3.3V/GND if it still resets. A 100 uF capacitor near the radio module also helps. This build caps WiFi TX power at 13 dBm, but the power path still has to be able to deliver the peak current.
+
 ## Wiring Notes
 
 1. **SPI Bus Sharing**: Display, radio, and SD card (if used) all share SCK/MOSI/MISO lines. Each device has its own CS line to prevent conflicts.
