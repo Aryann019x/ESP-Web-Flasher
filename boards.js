@@ -108,7 +108,7 @@ const FIRMWARE = [
    desc:'NOT validated — built clean, display/touch unconfirmed · 16MB flash — flash at 0x0000 with Erase',
    manifest:'manifests/manifest-flipper-s3-ili9341-touch.json',
    file:'firmware/Flipper-esp32s3-ili9341-touch.bin',
-   sha:'29ed223bbe40edbf67f7706261d5d95c94b4dfea67505aa3a86bc58ccf3ed69d',
+   sha:'330cdc49c50cf4ea22b72071352f43cd8e2957f216f25d4d41f6c01260c297e4',
    diagram:'diagrams/bruce-esp32s3-full.png',
    guide:'connections/esp32s3-ili9341.md'},
   {id:'s3-ili9341-16mb', group:'Bruce', chip:'ESP32-S3',
