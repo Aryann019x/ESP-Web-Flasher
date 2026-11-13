@@ -17,7 +17,7 @@ const FIRMWARE = [
    warning:'WiFi/AP features can brown out a weak USB supply on this board. Use a 5 V USB source rated for at least 1 A and a short data cable; if it still resets, report the 115200 boot log. This build caps WiFi TX at 13 dBm.',
    manifest:'manifests/manifest-esp-wroom32-ili9341.json',
    file:'firmware/Bruce-esp-wroom32-ili9341.bin',
-   sha:'37655f537c038a27df9a365d8f7c493a8dc668d03e498710473a643d5cb02b0e',
+   sha:'a28698d457d666c66346f8543724264d14237921954d121291bb5a91247744b4',
    diagram:'diagrams/bruce-espwroom32-full.png',
    guide:'connections/esp-wroom32-ili9341.md'},
   {id:'wroom32-st7789', group:'Bruce', chip:'ESP32',
