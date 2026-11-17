@@ -9,6 +9,10 @@ Pick a board, check the wiring, hit flash, read the boot log.
 **You need:** Chrome or Edge on a desktop, and a USB **data** cable.
 Charge-only cables are the number one reason flashing fails.
 
+WROOM32 dev boards usually talk through a CP210x or CH340 USB-serial chip. Windows
+often installs those automatically; if no COM port appears, install the driver for
+the chip on your board. ESP32-S3 boards with native USB do not need one.
+
 ## Features
 
 - **Prebuilt images** across ESP32 and ESP32-S3. Every board card shows its

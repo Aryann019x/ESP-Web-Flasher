@@ -9,8 +9,8 @@
     2. does the SHA-256 printed under a board still match that board's .bin?
        (a rebuilt .bin committed without updating boards.js would show a hash
        that is a lie, and the "verify what you flash" claim with it)
-    3. does the bootloader declare enough flash for the partition table, and
-       does every app image fit its slot?
+    3. does the bootloader match the board's declared flash size, cover the
+       partition table, and does every app image fit its slot?
     4. does each manifest point back at the same image as its board entry and
        keep every part inside that flash?
     5. does every image/font the page asks for exist, and is every asset in
@@ -92,7 +92,7 @@ function readPartitions(buf) {
   return out.length ? out : null;
 }
 
-function checkImage(id, chip, buf, file) {
+function checkImage(id, chip, buf, file, wantFlash) {
   const bootAt = BOOT_AT[chip];
   if (bootAt === undefined) {
     note(`${id}: no image check for chip ${chip}`);
@@ -110,6 +110,9 @@ function checkImage(id, chip, buf, file) {
   if (!boot.flashMb) {
     note(`${id}: ${file} bootloader has an invalid flash size`);
     return null;
+  }
+  if (wantFlash && boot.flashMb !== wantFlash) {
+    note(`${id}: ${file} bootloader says ${boot.flashMb}MB flash, board entry says ${wantFlash}MB`);
   }
 
   const parts = readPartitions(buf);
@@ -149,6 +152,9 @@ function checkImage(id, chip, buf, file) {
     if (img.chip !== CHIP_ID[chip]) {
       note(`${id}: ${file} ${app.label} is for chip 0x${img.chip.toString(16)}, expected ${chip}`);
     }
+    if (wantFlash && img.flashMb !== wantFlash) {
+      note(`${id}: ${file} ${app.label} says ${img.flashMb}MB flash, board entry says ${wantFlash}MB`);
+    }
     if (img.end > app.off + app.size) {
       note(`${id}: ${file} ${app.label} uses ${kb(img.end - app.off)} of a ${kb(app.size)} slot`);
     }
@@ -181,10 +187,10 @@ for (const board of FIRMWARE) {
     note(`${id}: no sha declared in boards.js`);
   }
 
-  // 3. the image itself: bootloader, partitions, app fit
+  // 3. the image itself: bootloader, partitions, app fit, declared flash size
   let flashMb = null;
   if (board.file && existsSync(at(board.file))) {
-    flashMb = checkImage(id, board.chip, readFileSync(at(board.file)), board.file);
+    flashMb = checkImage(id, board.chip, readFileSync(at(board.file)), board.file, board.flash);
   }
 
   // 4. the manifest agrees with the board entry

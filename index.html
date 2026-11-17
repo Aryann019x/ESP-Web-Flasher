@@ -30,7 +30,7 @@
 <title>ESP Firmware Flasher — Bruce, Marauder & Flipper, no install</title>
 <script type="module" src="https://unpkg.com/esp-web-tools@10/dist/web/install-button.js?module"></script>
 <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-<script src="boards.js?v=21"></script>
+<script src="boards.js?v=22"></script>
 <style>
 @font-face{font-family:'Departure Mono';font-style:normal;font-weight:400;font-display:swap;src:url(fonts/departure-mono-400.woff2) format('woff2')}
 @font-face{font-family:'JetBrains Mono';font-style:normal;font-weight:400;font-display:swap;src:url(fonts/jetbrains-mono-400-latin-ext.woff2) format('woff2');unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF}
@@ -667,7 +667,7 @@ html[data-theme="light"] md-menu{--md-menu-container-color:#F0EFEB;--md-list-ite
 <div class="bwrap hgrid">
 <div class="hL">
 <h1>FLASH FIRMWARE FROM YOUR BROWSER</h1>
-<p>Flash firmware on ESP32 and ESP32-S3 directly from your browser. No drivers. No software. Just USB.</p>
+<p>Flash firmware on ESP32 and ESP32-S3 directly from your browser. No flashing tool. No software. Just USB.</p>
 <div class="cta">
 <a class="solidbtn" href="#flash">⚡ Open the flasher</a>
 <a class="linebtn" href="#library">Browse the board library</a>
@@ -818,7 +818,7 @@ html[data-theme="light"] md-menu{--md-menu-container-color:#F0EFEB;--md-list-ite
 <p>The things that actually go wrong, and what fixes each one.</p>
 </header>
 <div class="faq">
-<details><summary>No port appears in the picker</summary><div>Hold <b>BOOT</b>, tap <b>RST</b>, release <b>BOOT</b>, then press Flash again. Boards without a USB-serial chip also need a data-capable cable — charge-only cables are the most common cause.</div></details>
+<details><summary>No port appears in the picker</summary><div>Hold <b>BOOT</b>, tap <b>RST</b>, release <b>BOOT</b>, then press Flash again. On native-USB S3 boards this is usually a cable or boot-mode issue. WROOM32 dev boards with a CP210x or CH340 USB-serial chip may also need that driver installed before Windows shows a port. Use a data-capable cable either way — charge-only cables are the most common cause.</div></details>
 <details><summary>The port is busy</summary><div>One application owns a serial port at a time. Close the terminal on this page first, and close any other serial monitor or IDE that may be holding the port, then reconnect.</div></details>
 <details><summary>The flash failed part-way</summary><div>Reconnect at a lower baud rate, use a powered USB port rather than an unpowered hub, and make sure the image matches its offset — every prebuilt here is merged at <code>0x0000</code> (custom split files use Your .bin + Add part).</div></details>
 <details><summary>Flash succeeds but the screen stays black</summary><div>Check the wiring guide — wrong display pins give a lit-but-blank screen even when the firmware boots fine. Some 16MB S3 modules are picky about flash mode and speed: the Marauder 16MB cards use DIO 40MHz for that reason. If a build bootloops, report the 115200 boot log and the exact card you used.</div></details>
@@ -1956,7 +1956,7 @@ try{
   try{ window.open(url,'_blank','noopener'); }catch(e){ location.href=url; }
  }
  const RULES=[
-  {l:'No port',k:['no port','not show','not detect','no device','picker empty','port appear'],t:'No port in the picker? Hold <b>BOOT</b>, tap <b>RST</b>, release <b>BOOT</b>, then hit FLASH again. Also: use Chrome/Edge desktop + a data-capable USB cable (charge-only cables are the #1 cause).'},
+  {l:'No port',k:['no port','not show','not detect','no device','picker empty','port appear'],t:'No port in the picker? Hold <b>BOOT</b>, tap <b>RST</b>, release <b>BOOT</b>, then hit FLASH again. WROOM32 boards with a CP210x or CH340 chip may need that USB-serial driver installed. Also use Chrome/Edge desktop and a data-capable USB cable (charge-only cables are the #1 cause).'},
   {l:'Port busy',k:['busy','already open','in use','holds','terminal'],t:'Port busy = one app holds it. Close the Terminal on this page first, close Arduino/PlatformIO/serial monitor, unplug/replug, then Connect again.'},
   {l:'Flash failed',k:['fail','stuck','error','half','stop','verify','wrong'],t:'Flash failed halfway? Use a powered USB port (no unpowered hub), lower baud, keep this tab in front, and confirm the image is a merged file flashed at <b>0x0000</b>.'},
   {l:'Offsets',k:['offset','0x1000','0x8000','0x10000','merged','partition','bootloader','app-only','app only'],t:'All prebuilt images here are merged — flash at <b>0x0000</b>. Only 0x1000/0x8000/0x10000 for split parts (bootloader / partition / app). Your own split files? Use Your .bin + Add part.'},
